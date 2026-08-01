@@ -3,7 +3,7 @@ import { createHash } from 'crypto'
 import { promises as fs } from 'fs'
 import os from 'os'
 import path from 'path'
-import { afterEach, describe, expect, it } from 'vitest'
+import { afterEach, describe, expect, it, vi } from 'vitest'
 import yaml from 'yaml'
 import {
   getNpmDistTag,
@@ -11,6 +11,7 @@ import {
   prepareNpmReleasePackages,
   validateReleaseVersion
 } from '../../scripts/npm-release-packages.mjs'
+import { buildNpmmirrorSyncUrl, triggerNpmmirrorSync } from '../../scripts/npmmirror-sync.mjs'
 
 const temporaryRoots: string[] = []
 
@@ -81,6 +82,55 @@ describe('npm release version metadata', () => {
 
   it('rejects incomplete versions', () => {
     expect(() => validateReleaseVersion('3.0')).toThrow('无效的发布版本号')
+  })
+})
+
+describe('npmmirror synchronization', () => {
+  it('builds the official sync endpoint for a scoped package', () => {
+    expect(buildNpmmirrorSyncUrl('@ztools-center/ztools-darwin-x64')).toBe(
+      'https://registry-direct.npmmirror.com/-/package/%40ztools-center/ztools-darwin-x64/syncs'
+    )
+  })
+
+  it('creates an anonymous sync task and exposes its id', async () => {
+    const fetchImplementation = vi.fn().mockResolvedValue({
+      ok: true,
+      status: 201,
+      json: async () => ({ ok: true, id: 'sync-task-id', state: 'waiting' })
+    })
+
+    const result = await triggerNpmmirrorSync('@ztools-center/ztools-win32-x64', {
+      fetchImplementation,
+      attempts: 1,
+      intervalMs: 0
+    })
+
+    expect(result).toEqual({ triggered: true, taskId: 'sync-task-id', state: 'waiting' })
+    expect(fetchImplementation).toHaveBeenCalledWith(
+      'https://registry-direct.npmmirror.com/-/package/%40ztools-center/ztools-win32-x64/syncs',
+      expect.objectContaining({
+        method: 'PUT',
+        headers: { accept: 'application/json' }
+      })
+    )
+  })
+
+  it('returns a diagnostic result when task creation keeps failing', async () => {
+    const fetchImplementation = vi.fn().mockResolvedValue({
+      ok: false,
+      status: 503,
+      json: async () => ({ ok: false })
+    })
+
+    const result = await triggerNpmmirrorSync('@ztools-center/ztools-darwin-arm64', {
+      fetchImplementation,
+      attempts: 2,
+      intervalMs: 0
+    })
+
+    expect(fetchImplementation).toHaveBeenCalledTimes(2)
+    expect(result.triggered).toBe(false)
+    expect(result.error).toContain('HTTP 503')
   })
 })
 

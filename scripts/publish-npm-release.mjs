@@ -6,6 +6,7 @@ import { readFile } from 'fs/promises'
 import path from 'path'
 import { promisify } from 'util'
 import { validateReleaseVersion } from './npm-release-packages.mjs'
+import { triggerNpmmirrorSync } from './npmmirror-sync.mjs'
 
 const execFileAsync = promisify(execFile)
 const NPM_REGISTRY = 'https://registry.npmjs.org/'
@@ -138,7 +139,7 @@ async function publishPackage(packageInfo, version, distTag) {
  * @param {number} timeoutMs 最大等待时间，单位毫秒。
  * @param {number} intervalMs 轮询间隔，单位毫秒。
  * @param {string[]} requiredTarballHosts 可接受的 tarball 域名；为空时不限制域名。
- * @returns {Promise<boolean>} 可见且完整性一致时返回 true，超时返回 false。
+ * @returns {Promise<{integrity: string, tarball: string, downloadUrl: string} | null>} 可见、完整性一致且可下载时返回分发信息，超时返回 null。
  * @throws {Error} registry 返回了与本地 tarball 不同的完整性值时抛出错误。
  */
 async function waitForRegistryIntegrity(
@@ -160,30 +161,31 @@ async function waitForRegistryIntegrity(
       const tarballHost = new URL(dist.tarball).hostname
       const hostMatches =
         requiredTarballHosts.length === 0 || requiredTarballHosts.includes(tarballHost)
-      if (hostMatches && (await isTarballReachable(dist.tarball))) return true
+      const downloadUrl = hostMatches ? await resolveTarballDownloadUrl(dist.tarball) : null
+      if (downloadUrl) return { ...dist, downloadUrl }
     }
 
     // registry 元数据为最终一致读取，等待固定间隔后继续查询。
     await new Promise((resolve) => setTimeout(resolve, intervalMs))
   }
-  return false
+  return null
 }
 
 /**
- * 通过 HEAD 请求确认 registry 返回的 tarball 已可实际下载。
+ * 通过 HEAD 请求确认 registry 返回的 tarball 已可实际下载，并解析最终 CDN 地址。
  * @param {string} tarballUrl registry 元数据中的 tarball 地址。
- * @returns {Promise<boolean>} 最终响应成功时返回 true，网络错误或非成功响应返回 false。
+ * @returns {Promise<string | null>} 最终响应成功时返回重定向后的 URL，否则返回 null。
  */
-async function isTarballReachable(tarballUrl) {
+async function resolveTarballDownloadUrl(tarballUrl) {
   try {
     const response = await fetch(tarballUrl, {
       method: 'HEAD',
       redirect: 'follow',
       signal: AbortSignal.timeout(15 * 1000)
     })
-    return response.ok
+    return response.ok ? response.url : null
   } catch {
-    return false
+    return null
   }
 }
 
@@ -222,7 +224,7 @@ async function main() {
   const npmjsResults = await Promise.all(
     packageIntegrities.map(async (packageInfo) => ({
       packageName: packageInfo.packageName,
-      verified: await waitForRegistryIntegrity(
+      dist: await waitForRegistryIntegrity(
         packageInfo.packageName,
         version,
         NPM_REGISTRY,
@@ -232,16 +234,35 @@ async function main() {
       )
     }))
   )
-  const npmjsTimeout = npmjsResults.find((result) => !result.verified)
+  const npmjsTimeout = npmjsResults.find((result) => !result.dist)
   if (npmjsTimeout) {
     throw new Error(`${npmjsTimeout.packageName}@${version} 发布后等待 npmjs 可见性超时`)
+  }
+
+  // npmjs 已可读取新版本后主动创建镜像任务，避免 changes stream 延迟。
+  const syncRequests = await Promise.all(
+    packageIntegrities.map(async (packageInfo) => ({
+      packageName: packageInfo.packageName,
+      result: await triggerNpmmirrorSync(packageInfo.packageName)
+    }))
+  )
+  for (const request of syncRequests) {
+    if (request.result.triggered) {
+      console.log(
+        `已触发 npmmirror 同步: ${request.packageName}@${version}, taskId=${request.result.taskId}, state=${request.result.state}`
+      )
+    } else {
+      console.warn(
+        `触发 npmmirror 同步失败，将继续等待自动同步: ${request.packageName}@${version}, error=${request.result.error}`
+      )
+    }
   }
 
   // npmjs 发布是硬性条件；镜像同步超时只告警，避免最终一致延迟诱发重复发布。
   const mirrorResults = await Promise.all(
     packageIntegrities.map(async (packageInfo) => ({
       packageName: packageInfo.packageName,
-      synced: await waitForRegistryIntegrity(
+      dist: await waitForRegistryIntegrity(
         packageInfo.packageName,
         version,
         NPMMIRROR_REGISTRY,
@@ -253,8 +274,11 @@ async function main() {
     }))
   )
   for (const result of mirrorResults) {
-    if (result.synced) console.log(`npmmirror 已同步: ${result.packageName}@${version}`)
-    else console.warn(`npmmirror 暂未同步: ${result.packageName}@${version}`)
+    if (result.dist) {
+      console.log(
+        `npmmirror 已同步: ${result.packageName}@${version}, registry=${result.dist.tarball}, download=${result.dist.downloadUrl}`
+      )
+    } else console.warn(`npmmirror 暂未同步: ${result.packageName}@${version}`)
   }
 }
 
