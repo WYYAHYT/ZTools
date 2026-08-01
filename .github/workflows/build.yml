@@ -21,6 +21,11 @@ on:
         description: '是否发布平台更新包到 npm'
         type: boolean
         default: true
+      artifact_run_id:
+        description: '仅重试发布时复用的 Actions run ID，留空则重新构建'
+        type: string
+        required: false
+        default: ''
 
 permissions:
   contents: write
@@ -28,6 +33,7 @@ permissions:
 jobs:
   build:
     name: Build on ${{ matrix.os }} (${{ matrix.arch }})
+    if: ${{ inputs.artifact_run_id == '' }}
     runs-on: ${{ matrix.os }}
 
     strategy:
@@ -279,9 +285,13 @@ jobs:
   publish-npm:
     name: Publish npm release packages
     needs: build
-    if: ${{ github.event_name != 'workflow_dispatch' || inputs.publish_npm }}
+    if: >-
+      ${{ always() &&
+          (needs.build.result == 'success' || inputs.artifact_run_id != '') &&
+          (github.event_name != 'workflow_dispatch' || inputs.publish_npm) }}
     runs-on: ubuntu-latest
     permissions:
+      actions: read
       contents: read
       id-token: write
 
@@ -337,18 +347,24 @@ jobs:
         with:
           name: artifact-macos-15-intel-x64
           path: dist/mac-x64
+          run-id: ${{ inputs.artifact_run_id || github.run_id }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Download macOS ARM64 artifact
         uses: actions/download-artifact@v4
         with:
           name: artifact-macos-14-arm64
           path: dist/mac-arm64
+          run-id: ${{ inputs.artifact_run_id || github.run_id }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Download Windows artifact
         uses: actions/download-artifact@v4
         with:
           name: artifact-windows-latest-x64
           path: dist/windows
+          run-id: ${{ inputs.artifact_run_id || github.run_id }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Prepare npm release packages
         env:

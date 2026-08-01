@@ -107,43 +107,74 @@ async function publishPackage(packageInfo, version, distTag) {
   if (process.env.GITHUB_ACTIONS === 'true') publishArgs.push('--provenance')
 
   // 认证信息仅通过 NODE_AUTH_TOKEN 和 setup-node 生成的临时 npmrc 传递。
-  await execFileAsync('npm', publishArgs, {
+  const publishResult = await execFileAsync('npm', publishArgs, {
     encoding: 'utf8',
     maxBuffer: 10 * 1024 * 1024,
     env: process.env
   })
+  if (publishResult.stdout.trim()) console.log(publishResult.stdout.trim())
+  if (publishResult.stderr.trim()) console.log(publishResult.stderr.trim())
 
-  // 发布成功后立即回查 npmjs，防止仅凭命令退出码遗漏 registry 侧的内容异常。
-  const remoteIntegrity = await readPublishedIntegrity(
-    packageInfo.packageName,
-    version,
-    NPM_REGISTRY
-  )
-  if (remoteIntegrity !== localIntegrity) {
-    throw new Error(`${packageInfo.packageName}@${version} 发布后完整性校验失败`)
-  }
   console.log(`已发布: ${packageInfo.packageName}@${version} (${distTag})`)
   return 'published'
 }
 
 /**
- * 等待 npmmirror 同步指定平台包版本。
+ * 等待 registry 暴露指定版本，并确认其 tarball 完整性符合预期。
  * @param {string} packageName npm 包名。
  * @param {string} version npm 包版本。
+ * @param {string} registry npm registry 地址。
+ * @param {string} expectedIntegrity 期望的 tarball SRI 完整性值。
  * @param {number} timeoutMs 最大等待时间，单位毫秒。
  * @param {number} intervalMs 轮询间隔，单位毫秒。
- * @returns {Promise<boolean>} 同步完成返回 true，超时返回 false。
+ * @returns {Promise<boolean>} 可见且完整性一致时返回 true，超时返回 false。
+ * @throws {Error} registry 返回了与本地 tarball 不同的完整性值时抛出错误。
  */
-async function waitForNpmmirror(packageName, version, timeoutMs, intervalMs) {
+async function waitForRegistryIntegrity(
+  packageName,
+  version,
+  registry,
+  expectedIntegrity,
+  timeoutMs,
+  intervalMs
+) {
   const deadline = Date.now() + timeoutMs
   while (Date.now() < deadline) {
-    const integrity = await readPublishedIntegrity(packageName, version, NPMMIRROR_REGISTRY)
-    if (integrity) return true
+    const integrity = await readPublishedIntegrity(packageName, version, registry)
+    if (integrity === expectedIntegrity) return true
+    if (integrity) throw new Error(`${packageName}@${version} registry 完整性不一致: ${registry}`)
 
-    // npmmirror 为最终一致系统，等待固定间隔后继续查询。
+    // registry 元数据为最终一致读取，等待固定间隔后继续查询。
     await new Promise((resolve) => setTimeout(resolve, intervalMs))
   }
   return false
+}
+
+/**
+ * 清理 npm 为首个预发布版本自动创建的 latest 标签。
+ * @param {string} packageName npm 包名。
+ * @param {string} version 当前发布版本号。
+ * @param {string} distTag 本次发布使用的 dist-tag。
+ * @returns {Promise<void>} 标签检查和必要清理完成后结束的 Promise。
+ * @throws {Error} dist-tag 查询或清理失败时抛出错误。
+ */
+async function removeUnexpectedLatestTag(packageName, version, distTag) {
+  if (distTag !== 'next') return
+  const { stdout } = await execFileAsync(
+    'npm',
+    ['view', packageName, 'dist-tags', '--json', '--registry', NPM_REGISTRY],
+    { encoding: 'utf8', maxBuffer: 1024 * 1024 }
+  )
+  const distTags = JSON.parse(stdout)
+  if (distTags?.latest !== version) return
+
+  // 仅移除指向当前预发布版本的 latest，绝不影响已有正式版标签。
+  await execFileAsync(
+    'npm',
+    ['dist-tag', 'rm', packageName, 'latest', '--registry', NPM_REGISTRY],
+    { encoding: 'utf8', maxBuffer: 1024 * 1024, env: process.env }
+  )
+  console.log(`已移除预发布版本上的 latest 标签: ${packageName}@${version}`)
 }
 
 /**
@@ -171,11 +202,48 @@ async function main() {
     await publishPackage(packageInfo, version, distTag)
   }
 
+  // 三个平台先全部上传，再并行等待首次发布在 npmjs 上完成公开传播。
+  const packageIntegrities = await Promise.all(
+    manifest.packages.map(async (packageInfo) => ({
+      ...packageInfo,
+      integrity: await calculateTarballIntegrity(packageInfo.tarball)
+    }))
+  )
+  const npmjsResults = await Promise.all(
+    packageIntegrities.map(async (packageInfo) => ({
+      packageName: packageInfo.packageName,
+      verified: await waitForRegistryIntegrity(
+        packageInfo.packageName,
+        version,
+        NPM_REGISTRY,
+        packageInfo.integrity,
+        10 * 60 * 1000,
+        15 * 1000
+      )
+    }))
+  )
+  const npmjsTimeout = npmjsResults.find((result) => !result.verified)
+  if (npmjsTimeout) {
+    throw new Error(`${npmjsTimeout.packageName}@${version} 发布后等待 npmjs 可见性超时`)
+  }
+  await Promise.all(
+    manifest.packages.map((packageInfo) =>
+      removeUnexpectedLatestTag(packageInfo.packageName, version, distTag)
+    )
+  )
+
   // npmjs 发布是硬性条件；镜像同步超时只告警，避免最终一致延迟诱发重复发布。
   const mirrorResults = await Promise.all(
-    manifest.packages.map(async (packageInfo) => ({
+    packageIntegrities.map(async (packageInfo) => ({
       packageName: packageInfo.packageName,
-      synced: await waitForNpmmirror(packageInfo.packageName, version, 5 * 60 * 1000, 15 * 1000)
+      synced: await waitForRegistryIntegrity(
+        packageInfo.packageName,
+        version,
+        NPMMIRROR_REGISTRY,
+        packageInfo.integrity,
+        5 * 60 * 1000,
+        15 * 1000
+      )
     }))
   )
   for (const result of mirrorResults) {
