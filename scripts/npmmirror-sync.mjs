@@ -2,7 +2,7 @@
 const NPMMIRROR_DIRECT_REGISTRY = 'https://registry-direct.npmmirror.com'
 
 /**
- * 构造 npmmirror 公共包同步任务地址，并保留 scoped package 的路径分隔符。
+ * 构造 npmmirror 公共包同步任务地址，并保留官方路由要求的 scoped package 原始路径。
  * @param {string} packageName npm 包名。
  * @returns {string} 可用于创建同步任务的完整 URL。
  * @throws {Error} 包名为空或不是 scoped package 时抛出错误。
@@ -12,9 +12,8 @@ export function buildNpmmirrorSyncUrl(packageName) {
     throw new Error(`无效的 scoped npm 包名: ${packageName}`)
   }
 
-  // 分段编码包名，避免将 scope 与包名之间的路径分隔符编码掉。
-  const encodedPackageName = packageName.split('/').map(encodeURIComponent).join('/')
-  return `${NPMMIRROR_DIRECT_REGISTRY}/-/package/${encodedPackageName}/syncs`
+  // registry-direct 路由不接受编码后的 %40，包名已通过严格格式校验可直接拼入路径。
+  return `${NPMMIRROR_DIRECT_REGISTRY}/-/package/${packageName}/syncs`
 }
 
 /**

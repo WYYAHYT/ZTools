@@ -88,7 +88,7 @@ describe('npm release version metadata', () => {
 describe('npmmirror synchronization', () => {
   it('builds the official sync endpoint for a scoped package', () => {
     expect(buildNpmmirrorSyncUrl('@ztools-center/ztools-darwin-x64')).toBe(
-      'https://registry-direct.npmmirror.com/-/package/%40ztools-center/ztools-darwin-x64/syncs'
+      'https://registry-direct.npmmirror.com/-/package/@ztools-center/ztools-darwin-x64/syncs'
     )
   })
 
@@ -107,7 +107,7 @@ describe('npmmirror synchronization', () => {
 
     expect(result).toEqual({ triggered: true, taskId: 'sync-task-id', state: 'waiting' })
     expect(fetchImplementation).toHaveBeenCalledWith(
-      'https://registry-direct.npmmirror.com/-/package/%40ztools-center/ztools-win32-x64/syncs',
+      'https://registry-direct.npmmirror.com/-/package/@ztools-center/ztools-win32-x64/syncs',
       expect.objectContaining({
         method: 'PUT',
         headers: { accept: 'application/json' }
