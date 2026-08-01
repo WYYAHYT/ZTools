@@ -151,33 +151,6 @@ async function waitForRegistryIntegrity(
 }
 
 /**
- * 清理 npm 为首个预发布版本自动创建的 latest 标签。
- * @param {string} packageName npm 包名。
- * @param {string} version 当前发布版本号。
- * @param {string} distTag 本次发布使用的 dist-tag。
- * @returns {Promise<void>} 标签检查和必要清理完成后结束的 Promise。
- * @throws {Error} dist-tag 查询或清理失败时抛出错误。
- */
-async function removeUnexpectedLatestTag(packageName, version, distTag) {
-  if (distTag !== 'next') return
-  const { stdout } = await execFileAsync(
-    'npm',
-    ['view', packageName, 'dist-tags', '--json', '--registry', NPM_REGISTRY],
-    { encoding: 'utf8', maxBuffer: 1024 * 1024 }
-  )
-  const distTags = JSON.parse(stdout)
-  if (distTags?.latest !== version) return
-
-  // 仅移除指向当前预发布版本的 latest，绝不影响已有正式版标签。
-  await execFileAsync(
-    'npm',
-    ['dist-tag', 'rm', packageName, 'latest', '--registry', NPM_REGISTRY],
-    { encoding: 'utf8', maxBuffer: 1024 * 1024, env: process.env }
-  )
-  console.log(`已移除预发布版本上的 latest 标签: ${packageName}@${version}`)
-}
-
-/**
  * 发布清单中的所有平台包并验证 npmjs 与 npmmirror 可见性。
  * @returns {Promise<void>} 发布与验证完成后结束的 Promise。
  * @throws {Error} 清单无效、认证缺失或 npm 发布失败时抛出错误。
@@ -226,11 +199,6 @@ async function main() {
   if (npmjsTimeout) {
     throw new Error(`${npmjsTimeout.packageName}@${version} 发布后等待 npmjs 可见性超时`)
   }
-  await Promise.all(
-    manifest.packages.map((packageInfo) =>
-      removeUnexpectedLatestTag(packageInfo.packageName, version, distTag)
-    )
-  )
 
   // npmjs 发布是硬性条件；镜像同步超时只告警，避免最终一致延迟诱发重复发布。
   const mirrorResults = await Promise.all(
