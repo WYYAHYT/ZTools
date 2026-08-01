@@ -17,6 +17,10 @@ on:
         description: '是否发布到 GitHub Release'
         type: boolean
         default: true
+      publish_npm:
+        description: '是否发布平台更新包到 npm'
+        type: boolean
+        default: true
 
 permissions:
   contents: write
@@ -64,7 +68,7 @@ jobs:
             prerelease="${INPUT_PRERELEASE:-true}"
           else
             version="${GITHUB_REF_NAME#v}"
-            prerelease="false"
+            prerelease="$([ "${version#*-}" != "$version" ] && echo true || echo false)"
           fi
 
           if [ -z "$version" ]; then
@@ -188,7 +192,7 @@ jobs:
             prerelease="${INPUT_PRERELEASE:-true}"
           else
             version="${GITHUB_REF_NAME#v}"
-            prerelease="false"
+            prerelease="$([ "${version#*-}" != "$version" ] && echo true || echo false)"
           fi
 
           if [ -z "$version" ]; then
@@ -271,3 +275,94 @@ jobs:
             dist/mac-arm64/*.zip
             dist/mac-arm64/*.blockmap
             dist/release/*.yml
+
+  publish-npm:
+    name: Publish npm release packages
+    needs: build
+    if: ${{ github.event_name != 'workflow_dispatch' || inputs.publish_npm }}
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
+
+    steps:
+      - name: Check out git repository
+        uses: actions/checkout@v4
+
+      - name: Resolve npm release metadata
+        id: npm_release_meta
+        shell: bash
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          INPUT_VERSION: ${{ inputs.version }}
+        run: |
+          if [ "$EVENT_NAME" = "workflow_dispatch" ]; then
+            version="${INPUT_VERSION#v}"
+          else
+            version="${GITHUB_REF_NAME#v}"
+          fi
+
+          if [ -z "$version" ]; then
+            echo "Release version is required" >&2
+            exit 1
+          fi
+
+          if [ "${version#*-}" != "$version" ]; then
+            npm_tag="next"
+          else
+            npm_tag="latest"
+          fi
+
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+          echo "npm_tag=$npm_tag" >> "$GITHUB_OUTPUT"
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: 9
+
+      - name: Install Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: 'pnpm'
+          registry-url: 'https://registry.npmjs.org/'
+          always-auth: true
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Download macOS x64 artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: artifact-macos-15-intel-x64
+          path: dist/mac-x64
+
+      - name: Download macOS ARM64 artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: artifact-macos-14-arm64
+          path: dist/mac-arm64
+
+      - name: Download Windows artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: artifact-windows-latest-x64
+          path: dist/windows
+
+      - name: Prepare npm release packages
+        env:
+          RELEASE_VERSION: ${{ steps.npm_release_meta.outputs.version }}
+        run: pnpm release:npm:prepare
+
+      - name: Verify npm credentials
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: npm whoami --registry https://registry.npmjs.org/
+
+      - name: Publish npm release packages
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: >-
+          pnpm release:npm:publish --
+          --tag ${{ steps.npm_release_meta.outputs.npm_tag }}

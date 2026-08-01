@@ -36,6 +36,8 @@
     "build:linux": "cross-env ZTOOLS_TARGET_PLATFORM=linux pnpm build && electron-builder --linux",
     "build:linux:x64": "cross-env ZTOOLS_TARGET_PLATFORM=linux pnpm build && electron-builder --linux --x64",
     "build:linux:arm64": "cross-env ZTOOLS_TARGET_PLATFORM=linux pnpm build && electron-builder --linux --arm64",
+    "release:npm:prepare": "node scripts/prepare-npm-release.mjs",
+    "release:npm:publish": "node scripts/publish-npm-release.mjs",
     "updater": "node scripts/updater.mjs",
     "test": "vitest run",
     "test:windows-scanner": "electron scripts/compare-windows-scanner.cjs",
