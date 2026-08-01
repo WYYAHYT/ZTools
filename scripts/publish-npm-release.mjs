@@ -267,7 +267,7 @@ async function main() {
         version,
         NPMMIRROR_REGISTRY,
         packageInfo.integrity,
-        5 * 60 * 1000,
+        15 * 60 * 1000,
         15 * 1000,
         ['registry.npmmirror.com', 'cdn.npmmirror.com']
       )
