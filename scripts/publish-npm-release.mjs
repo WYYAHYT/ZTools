@@ -47,21 +47,35 @@ async function calculateTarballIntegrity(filePath) {
 }
 
 /**
- * 查询 npm registry 中指定包版本的完整性值。
+ * 查询 npm registry 中指定包版本的分发信息。
  * @param {string} packageName npm 包名。
  * @param {string} version npm 包版本。
  * @param {string} registry npm registry 地址。
- * @returns {Promise<string | null>} 已发布版本的 dist.integrity，不存在时返回 null。
+ * @returns {Promise<{integrity: string, tarball: string} | null>} 已发布版本的分发信息，不存在时返回 null。
  * @throws {Error} registry 返回非 404 查询错误时抛出错误。
  */
-async function readPublishedIntegrity(packageName, version, registry) {
+async function readPublishedDist(packageName, version, registry) {
   try {
     const { stdout } = await execFileAsync(
       'npm',
-      ['view', `${packageName}@${version}`, 'dist.integrity', '--json', '--registry', registry],
+      [
+        'view',
+        `${packageName}@${version}`,
+        'dist.integrity',
+        'dist.tarball',
+        '--json',
+        '--prefer-online',
+        '--registry',
+        registry
+      ],
       { encoding: 'utf8', maxBuffer: 1024 * 1024 }
     )
-    return JSON.parse(stdout) || null
+    const dist = JSON.parse(stdout)
+    if (!dist?.['dist.integrity'] || !dist?.['dist.tarball']) return null
+    return {
+      integrity: dist['dist.integrity'],
+      tarball: dist['dist.tarball']
+    }
   } catch (error) {
     const stderr = String(error?.stderr || '')
     if (stderr.includes('E404') || stderr.includes('404 Not Found')) return null
@@ -79,15 +93,11 @@ async function readPublishedIntegrity(packageName, version, registry) {
  */
 async function publishPackage(packageInfo, version, distTag) {
   const localIntegrity = await calculateTarballIntegrity(packageInfo.tarball)
-  const publishedIntegrity = await readPublishedIntegrity(
-    packageInfo.packageName,
-    version,
-    NPM_REGISTRY
-  )
+  const publishedDist = await readPublishedDist(packageInfo.packageName, version, NPM_REGISTRY)
 
   // npm 版本不可覆盖；重跑只允许跳过字节完全一致的 tarball。
-  if (publishedIntegrity) {
-    if (publishedIntegrity !== localIntegrity) {
+  if (publishedDist) {
+    if (publishedDist.integrity !== localIntegrity) {
       throw new Error(`${packageInfo.packageName}@${version} 已存在，但 tarball 完整性不一致`)
     }
     console.log(`跳过已发布且完整性一致的版本: ${packageInfo.packageName}@${version}`)
@@ -127,6 +137,7 @@ async function publishPackage(packageInfo, version, distTag) {
  * @param {string} expectedIntegrity 期望的 tarball SRI 完整性值。
  * @param {number} timeoutMs 最大等待时间，单位毫秒。
  * @param {number} intervalMs 轮询间隔，单位毫秒。
+ * @param {string[]} requiredTarballHosts 可接受的 tarball 域名；为空时不限制域名。
  * @returns {Promise<boolean>} 可见且完整性一致时返回 true，超时返回 false。
  * @throws {Error} registry 返回了与本地 tarball 不同的完整性值时抛出错误。
  */
@@ -136,18 +147,44 @@ async function waitForRegistryIntegrity(
   registry,
   expectedIntegrity,
   timeoutMs,
-  intervalMs
+  intervalMs,
+  requiredTarballHosts = []
 ) {
   const deadline = Date.now() + timeoutMs
   while (Date.now() < deadline) {
-    const integrity = await readPublishedIntegrity(packageName, version, registry)
-    if (integrity === expectedIntegrity) return true
-    if (integrity) throw new Error(`${packageName}@${version} registry 完整性不一致: ${registry}`)
+    const dist = await readPublishedDist(packageName, version, registry)
+    if (dist?.integrity && dist.integrity !== expectedIntegrity) {
+      throw new Error(`${packageName}@${version} registry 完整性不一致: ${registry}`)
+    }
+    if (dist?.integrity === expectedIntegrity) {
+      const tarballHost = new URL(dist.tarball).hostname
+      const hostMatches =
+        requiredTarballHosts.length === 0 || requiredTarballHosts.includes(tarballHost)
+      if (hostMatches && (await isTarballReachable(dist.tarball))) return true
+    }
 
     // registry 元数据为最终一致读取，等待固定间隔后继续查询。
     await new Promise((resolve) => setTimeout(resolve, intervalMs))
   }
   return false
+}
+
+/**
+ * 通过 HEAD 请求确认 registry 返回的 tarball 已可实际下载。
+ * @param {string} tarballUrl registry 元数据中的 tarball 地址。
+ * @returns {Promise<boolean>} 最终响应成功时返回 true，网络错误或非成功响应返回 false。
+ */
+async function isTarballReachable(tarballUrl) {
+  try {
+    const response = await fetch(tarballUrl, {
+      method: 'HEAD',
+      redirect: 'follow',
+      signal: AbortSignal.timeout(15 * 1000)
+    })
+    return response.ok
+  } catch {
+    return false
+  }
 }
 
 /**
@@ -210,7 +247,8 @@ async function main() {
         NPMMIRROR_REGISTRY,
         packageInfo.integrity,
         5 * 60 * 1000,
-        15 * 1000
+        15 * 1000,
+        ['registry.npmmirror.com', 'cdn.npmmirror.com']
       )
     }))
   )
