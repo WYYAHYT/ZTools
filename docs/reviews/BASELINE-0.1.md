@@ -4,7 +4,7 @@
 - Review opened: 2026-08-21
 - Baseline owner: zhangchonghao
 - Review accepted: 2026-08-21
-- Baseline commit: pending creation and follow-up recording
+- Baseline commit: `3a5ad77` (`docs: establish design baseline 0.1`)
 - Baseline tag: not created; optional and not required to close Gate 0
 - Gate 1 authorization: granted for design and engineering preparation
 
@@ -18,12 +18,12 @@
 
 | 日期 | 决策 | 决策者 | 依据 | 状态 |
 | --- | --- | --- | --- | --- |
-| 2026-08-21 | ADR-0001 至 ADR-0005 的基础架构方向 | zhangchonghao | 项目设计讨论；将在首个基线提交中固化 | accepted，commit pending |
-| 2026-08-21 | ADR-0006：首阶段不运行旧插件 | zhangchonghao | 维护者明确接受推荐方案；将在首个基线提交中固化 | accepted，commit pending |
-| 2026-08-21 | ADR-0007：Portal/D-Bus + 可选 GNOME Shell 扩展 | zhangchonghao | 维护者明确接受推荐方案；将在首个基线提交中固化 | accepted，commit pending |
-| 2026-08-21 | ADR-0008：SQLite + 插件命名空间 + 附件 + 系统密钥库 | zhangchonghao | 维护者明确接受推荐方案；将在首个基线提交中固化 | accepted，commit pending |
+| 2026-08-21 | ADR-0001 至 ADR-0005 的基础架构方向 | zhangchonghao | 项目设计讨论；基线提交 `3a5ad77` | accepted |
+| 2026-08-21 | ADR-0006：首阶段不运行旧插件 | zhangchonghao | 维护者明确接受推荐方案；基线提交 `3a5ad77` | accepted |
+| 2026-08-21 | ADR-0007：Portal/D-Bus + 可选 GNOME Shell 扩展 | zhangchonghao | 维护者明确接受推荐方案；基线提交 `3a5ad77` | accepted |
+| 2026-08-21 | ADR-0008：SQLite + 插件命名空间 + 附件 + 系统密钥库 | zhangchonghao | 维护者明确接受推荐方案；基线提交 `3a5ad77` | accepted |
 | 2026-08-21 | 独立文档 review 意见纳入基线 | zhangchonghao | 维护者提供的独立 Agent review；处置结果已逐项记录 | accepted |
-| 2026-08-21 | 接受独立 review 处置与修订后的主题文档 | zhangchonghao | 维护者明确回复“我审阅了，同意” | accepted，commit pending |
+| 2026-08-21 | 接受独立 review 处置与修订后的主题文档 | zhangchonghao | 维护者明确回复“我审阅了，同意”；基线提交 `3a5ad77` | accepted |
 | 2026-08-21 | 接受 ADR-0009、ADR-0010、ADR-0011 与 `ERROR_MODEL.md` | zhangchonghao | 维护者明确回复“我审阅了，同意” | accepted，implementation pending |
 | 2026-08-21 | 关闭 Gate 0，授权开始 Gate 1 设计与工程准备 | zhangchonghao | 本评审记录与 `OPEN_ITEMS.md` 中继续有效的工程基线阻断项 | granted |
 
@@ -56,7 +56,7 @@
 - [x] OPEN_ITEMS 中 Gate 1 前置项的范围、负责人和处理顺序经维护者确认。
 - [x] ADR-0009、ADR-0010、ADR-0011 与 ERROR_MODEL 已由维护者接受。
 - [x] 所有本地文档链接、状态索引和格式检查通过。
-- [ ] 创建首个基线提交，并在本文件记录提交哈希。
+- [x] 已创建首个基线提交 `3a5ad77`，并在本文件记录。
 - [x] 标签是可选项；本轮不创建标签，不阻断 Gate 0。
 - [x] 维护者已明确允许开始 Gate 1 的设计与工程准备。
 

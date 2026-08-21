@@ -4,7 +4,7 @@
 - Proposed: 2026-08-21
 - Accepted: 2026-08-21
 - Deciders: zhangchonghao
-- Approval record: [Baseline 0.1 review](../reviews/BASELINE-0.1.md), baseline commit pending
+- Approval record: [Baseline 0.1 review](../reviews/BASELINE-0.1.md), baseline commit `3a5ad77`
 - Reviewers: independent Agent review incorporated; zhangchonghao
 - Verification owner: Gate 1 implementation owner
 - Review by: before Gate 1 implementation

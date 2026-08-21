@@ -10,7 +10,7 @@
 
 | 决策或交付物 | 最迟完成时间 | 当前状态 | 负责人 | 阻断事项 |
 | --- | --- | --- | --- | --- |
-| Baseline 0.1 最终评审与首个提交 | Gate 1 前 | accepted；commit recording in progress | zhangchonghao | 整个 Gate 1 |
+| Baseline 0.1 最终评审与首个提交 | Gate 1 前 | accepted；baseline commit `3a5ad77` | zhangchonghao | completed |
 | `PRODUCT.md` 最终接受 | Gate 1 前 | accepted | zhangchonghao | completed |
 | `ROADMAP.md` 最终接受 | Gate 1 前 | accepted | zhangchonghao | completed |
 | `ARCHITECTURE.md` 修订稿最终接受 | Gate 1 前 | accepted | zhangchonghao | completed |
