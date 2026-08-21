@@ -6,7 +6,7 @@
 - Deciders: zhangchonghao
 - Approval record: [Baseline 0.1 review](../reviews/BASELINE-0.1.md), baseline commit `3a5ad77`
 - Reviewers: baseline design discussion; independent Agent review incorporated
-- Verification owner: unassigned
+- Verification owner: zhangchonghao
 - Review by: after first representative Secure Runtime plugins
 - Supersedes: none
 - Superseded by: none

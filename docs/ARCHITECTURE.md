@@ -8,7 +8,7 @@
 
 ZTools vNext 采用模块化单体作为默认部署形态，在安全、故障隔离或平台 API 要求处使用独立 Plugin Worker、Electron Renderer/UtilityProcess 和可选 Platform Helper。
 
-工程技术栈采用 Electron、Vue 3、TypeScript 与 pnpm workspace，不属于 ADR-0001 的“从零模块化单体”决定。其候选比较、平台风险和退出策略记录于已接受的 [ADR-0009](adr/0009-engineering-technology-stack.md)。首次安装依赖或创建工程骨架前仍需接受 [ENGINEERING_BASELINE.md](ENGINEERING_BASELINE.md)，固定精确版本和平台矩阵。
+工程技术栈采用 Electron、Vue 3、TypeScript 与 pnpm workspace，不属于 ADR-0001 的“从零模块化单体”决定。其候选比较、平台风险和退出策略记录于已接受的 [ADR-0009](adr/0009-engineering-technology-stack.md)。创建正式 workspace、提交正式锁文件或安装正式产品依赖前仍需接受 [ENGINEERING_BASELINE.md](ENGINEERING_BASELINE.md)，固定精确版本和平台矩阵；接受前只允许按其流程运行经授权的隔离验证原型。
 
 ## 逻辑结构
 
@@ -38,7 +38,7 @@ Plugin UI / Worker                    Windows | macOS | GNOME Wayland
 ### Application Services
 
 - 编排用例、事务、取消、策略和领域对象。
-- 只依赖 Ports，不知道具体数据库、Portal 或窗口实现。
+- 可以依赖本模块 Domain、本模块拥有的 Ports 和必要的 Public Module Contract；仅通过 Ports 使用数据库、平台与其他外部能力，不依赖具体 Adapter 或 Delivery 实现。
 - 建立搜索预算、插件调用顺序、权限检查和生命周期状态转换。
 
 ### Contracts

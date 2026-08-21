@@ -14,7 +14,7 @@
 
 系统不承诺抵御已经完全控制用户操作系统或宿主安装目录的攻击者。
 
-本文件定义安全架构与强制不变量；受保护资产、攻击者能力、数据流、攻击路径、控制和验证证据在 [THREAT_MODEL.md](THREAT_MODEL.md) 中维护。相关功能的威胁模型未达到对应 Gate 要求时，不得仅凭本文件进入实现。
+本文件定义安全架构与强制不变量；受保护资产、攻击者能力、数据流、攻击路径、控制和验证证据在 [THREAT_MODEL.md](THREAT_MODEL.md) 及对应 Gate 切片中维护。Gate 1 的 Host Renderer/Contract Gateway 切片见 [GATE1_HOST_GATEWAY.md](threat-model/GATE1_HOST_GATEWAY.md)。相关功能的威胁模型未达到对应 Gate 要求时，不得仅凭本文件进入实现。
 
 ## 信任区域
 

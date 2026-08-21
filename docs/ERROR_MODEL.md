@@ -64,6 +64,8 @@
 
 如果调用方无法确定写操作是否提交，结果必须表达为 `outcome-unknown` 细分码，并将 `retryability` 设为 `query-status-first`；禁止把它映射为普通失败后直接重试。
 
+进一步评审提出 [ADR-0012](adr/0012-effect-outcome-certainty.md)，建议把副作用确定性改为与 `category` 正交的 `effectOutcome` 字段。ADR-0012 当前为 `proposed`，因此本段细分码模型仍是现行已接受规范；在 ADR-0012 被接受前，不得把候选字段固化为正式 Contract。
+
 ## 错误所有权
 
 - Domain 拥有业务不变量和稳定领域拒绝原因，不知道 HTTP、IPC、Electron 或平台错误码。
@@ -90,6 +92,7 @@
 ## 实施前验证条件
 
 - ADR-0010 与本模型使用一致术语。
+- ADR-0012 已决定，并按决定更新本模型与结果信封。
 - 至少用一个只读方法、一个幂等写方法和一个结果可能未知的方法完成纸面例证。
 - 测试计划覆盖取消竞态、deadline、迟到结果、断线、重复请求和脱敏。
 - 实现证据完成后才可把本文状态改为 `implemented`。

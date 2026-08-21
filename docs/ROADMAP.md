@@ -45,8 +45,10 @@ Gate 0 已于 2026-08-21 经维护者评审关闭。基线提交及 Gate 1 授�
 - 接受工程技术栈 ADR-0009。
 - 接受 Contract、身份绑定与协议所有权 ADR-0010。
 - 接受 Capability 多维状态 ADR-0011。
+- 决定副作用结果确定性 ADR-0012，并同步 ERROR_MODEL。
 - 接受 `ERROR_MODEL.md`，统一取消、超时、幂等和未知副作用结果。
 - 接受 [ENGINEERING_BASELINE.md](ENGINEERING_BASELINE.md)，包括操作系统、CPU、CI runner 镜像与 Electron 兼容窗口。
+- 接受 [Gate 1 Host Renderer/Contract Gateway 威胁模型切片](threat-model/GATE1_HOST_GATEWAY.md)。
 - 确认 [ARCHITECTURE.md](ARCHITECTURE.md) 中的包级依赖矩阵和禁止导入规则足以自动执行。
 
 测试策略已经记录于 [TESTING.md](TESTING.md)。上述事项以 [OPEN_ITEMS.md](OPEN_ITEMS.md) 为准，任一阻断项未完成都不能开始对应工程实现。

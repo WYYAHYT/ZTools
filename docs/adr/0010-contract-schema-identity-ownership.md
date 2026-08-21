@@ -5,8 +5,8 @@
 - Accepted: 2026-08-21
 - Deciders: zhangchonghao
 - Approval record: [Baseline 0.1 review](../reviews/BASELINE-0.1.md), baseline commit `3a5ad77`
-- Reviewers: independent Agent review incorporated; zhangchonghao
-- Verification owner: Gate 1 implementation owner
+- Reviewers: independent Agent review incorporated; zhangchonghao; Gate 1 security slice review pending
+- Verification owner: zhangchonghao
 - Review by: before Gate 1 Contract Gateway implementation
 - Supersedes: none
 - Superseded by: none

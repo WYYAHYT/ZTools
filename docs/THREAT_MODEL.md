@@ -3,9 +3,9 @@
 - Status: draft
 - Baseline: 0.1
 - Last updated: 2026-08-21
-- Security review owner: unassigned
+- Security review owner: zhangchonghao
 
-本文件把 [SECURITY.md](SECURITY.md) 中的安全目标与不变量扩展为可维护的威胁模型。当前是 Gate 0 骨架，不声称已经覆盖尚未设计的插件分发、网络代理和更新协议。对应功能进入实现前，相关数据流、威胁和验证证据必须补齐并接受。
+本文件把 [SECURITY.md](SECURITY.md) 中的安全目标与不变量扩展为可维护的跨 Gate 威胁模型骨架，不声称已经覆盖尚未设计的插件分发、网络代理和更新协议。Gate 1 的 Host Renderer 与 Contract Gateway 范围由 [专用威胁模型切片](threat-model/GATE1_HOST_GATEWAY.md) 负责；对应功能进入实现前，相关切片必须补齐并接受。
 
 ## 范围与假设
 
@@ -58,8 +58,8 @@ Platform Helper / GNOME Extension ◄──────────────�
 
 | ID | 威胁/攻击路径 | 主要控制 | 当前证据 | 最迟完成 |
 | --- | --- | --- | --- | --- |
-| TM-01 | 插件伪造 ID、Caller Role 或权限字段 | 连接绑定身份、默认拒绝、ADR-0010 | 设计草案 | Gate 1 Gateway |
-| TM-02 | 畸形/超大消息、原型污染或 Schema 绕过 | 严格 Schema、大小/深度限制、未知字段拒绝 | 设计草案 | Gate 1 Gateway |
+| TM-01 | 调用方伪造身份、Caller Role 或权限字段 | 连接绑定身份、默认拒绝、ADR-0010 | 已接受设计；Gate 1 Host 身份验证证据待专用切片 | Gate 1 Gateway；插件身份扩展留 Gate 3 |
+| TM-02 | 畸形/超大消息、原型污染或 Schema 绕过 | 严格 Schema、大小/深度限制、未知字段拒绝 | ADR-0010 已接受；消息上限与负向验证待 Gate 1 切片 | Gate 1 Gateway |
 | TM-03 | Plugin UI 取得 Node/Electron/裸 IPC | sandbox、context isolation、最小 Bridge、恶意夹具 | ADR-0003 | Gate 3 |
 | TM-04 | 插件跨命名空间读取数据或密钥 | 身份绑定 Storage Port、系统密钥库、越权测试 | ADR-0008 | Gate 3 |
 | TM-05 | 安装包在校验后被替换、降级或回滚 | 原子安装、内容寻址、签名/来源/版本策略 | 未设计 | 分发实现前 |
@@ -67,9 +67,9 @@ Platform Helper / GNOME Extension ◄──────────────�
 | TM-07 | 卸载后 Worker、Handle、Portal 会话或数据残留 | 生命周期状态机、所有权、清理测试 | 未设计 | Gate 3/4 |
 | TM-08 | Host UI 渲染外部 HTML/脚本导致信任区污染 | 严格 CSP、结构化数据渲染、导航默认拒绝 | SECURITY 不变量 | Gate 2/3 |
 | TM-09 | 网络代理造成 SSRF、DNS 重绑定或访问本机服务 | 目标策略、解析后地址检查、重定向复验、私网规则 | 未决 ADR | 首个网络能力前 |
-| TM-10 | Helper/Shell 扩展被本地进程冒充或接口过宽 | 本地主体认证、版本握手、Schema、方法白名单、速率限制 | ADR-0007/0010 草案 | 首个 Helper/扩展前 |
+| TM-10 | Helper/Shell 扩展被本地进程冒充或接口过宽 | 本地主体认证、版本握手、Schema、方法白名单、速率限制 | ADR-0007/0010 已接受；具体组件认证尚未设计 | 首个 Helper/扩展前 |
 | TM-11 | 权限已撤销但缓存令牌继续工作 | 每次调用状态校验、令牌撤销、订阅终止 | 设计原则 | Gate 3/4 |
-| TM-12 | 超时后自动重试导致重复副作用 | 幂等键、状态查询、outcome-unknown | ERROR_MODEL 草案 | Gate 1 |
+| TM-12 | 超时后自动重试导致重复副作用 | 幂等键、状态查询、正交结果确定性 | ERROR_MODEL 已接受；ADR-0012 与实施验证待完成 | Gate 1 Gateway |
 | TM-13 | 日志、trace、截图或崩溃转储泄露用户内容 | 默认不记录、脱敏、有限保留、测试检查 | TESTING/SECURITY | 每个 Gate |
 | TM-14 | 插件消耗 CPU、内存、消息、磁盘或日志拖垮宿主 | 配额、背压、超时、隔离、有限重启 | 目标设计 | Gate 3 |
 | TM-15 | 发布密钥被不可信分支或插件样本读取 | 受保护环境、工作流权限分离、来源限制 | 测试原则 | 发布前 |
@@ -122,7 +122,7 @@ Platform Helper / GNOME Extension ◄──────────────�
 
 - 每个威胁必须指向至少一个预防/检测控制和一项自动或人工证据。
 - “由沙箱保护”“仅本机通信”或“用户已安装”不能单独作为控制。
-- Gate 1 前接受身份、Schema、错误和进程边界相关条目。
+- Gate 1 Contract Gateway 实现前接受 [Gate 1 Host Gateway 威胁模型切片](threat-model/GATE1_HOST_GATEWAY.md)，覆盖 Host 身份、Schema、消息限制、错误、取消和进程边界。
 - Gate 3 前补齐插件安装、升级、运行、禁用、卸载的具体数据流并完成安全评审。
 - 首个网络能力、Helper、市场、自动更新或发布签名实现前，先补齐对应威胁与 ADR。
 - 发现未控制的高影响威胁时阻断相关 Gate，不以文档待办替代控制。

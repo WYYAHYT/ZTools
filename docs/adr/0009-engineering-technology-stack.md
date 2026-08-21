@@ -6,7 +6,7 @@
 - Deciders: zhangchonghao
 - Approval record: [Baseline 0.1 review](../reviews/BASELINE-0.1.md), baseline commit `3a5ad77`
 - Reviewers: independent Agent review incorporated; zhangchonghao
-- Verification owner: Gate 1 implementation owner
+- Verification owner: zhangchonghao
 - Review by: before Gate 1 implementation
 - Supersedes: none
 - Superseded by: none
@@ -68,7 +68,7 @@ ADR-0001 决定从零建设模块化单体，但其基线冻结前的早期候�
 - WebPreferences 安全不变量、业务代码禁用裸 IPC 和包依赖方向必须由 CI 阻断。
 - 不为 Electron 方便而改变 Domain、Application Port 或插件公开契约。
 
-该决策允许进入 Gate 1 的工程准备，但首次安装依赖或生成工程骨架前，必须先接受 `ENGINEERING_BASELINE.md` 中的精确版本和平台矩阵。
+该决策允许进入 Gate 1 的工程准备。`ENGINEERING_BASELINE.md` 被接受前，只允许经维护者明确授权，在临时目录、临时 worktree 或专用验证分支安装候选依赖并运行可丢弃原型；创建正式 workspace、提交正式锁文件或安装正式产品依赖前，必须先接受其中的精确版本和平台矩阵。
 
 ## 后果
 

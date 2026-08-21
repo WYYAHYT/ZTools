@@ -35,9 +35,12 @@ ADR 记录一项重要决策当时的背景、选择、替代方案和后果。�
 | [0009](0009-engineering-technology-stack.md) | 工程技术栈 | accepted |
 | [0010](0010-contract-schema-identity-ownership.md) | Contract Schema、连接身份与协议所有权 | accepted |
 | [0011](0011-multidimensional-capability-state.md) | Capability 多维状态模型 | accepted |
+| [0012](0012-effect-outcome-certainty.md) | 副作用结果确定性模型 | proposed |
 
 ## 首批范围决策
 
 ADR-0006、ADR-0007 与 ADR-0008 已由维护者接受。它们确定了首阶段兼容、GNOME Wayland 集成和持久化方向；尚未完成实现与验证，因此不能标记为 `implemented`。
 
 ADR-0009、ADR-0010 与 ADR-0011 源自独立评审指出的 Gate 1 缺口，已由维护者接受。它们允许进入 Gate 1 设计与工程准备，但不代表对应实现已经完成。
+
+ADR-0012 源自进一步评审对 `outcome-unknown` 的语义澄清，在维护者接受前不改变当前 ERROR_MODEL；它阻断 Contract Gateway 结果信封实现。
