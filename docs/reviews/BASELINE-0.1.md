@@ -27,7 +27,7 @@
 | 2026-08-21 | 接受 ADR-0009、ADR-0010、ADR-0011 与 `ERROR_MODEL.md` | zhangchonghao | 维护者明确回复“我审阅了，同意” | accepted，implementation pending |
 | 2026-08-21 | 关闭 Gate 0，授权开始 Gate 1 设计与工程准备 | zhangchonghao | 本评审记录与 `OPEN_ITEMS.md` 中继续有效的工程基线阻断项 | granted |
 
-“项目设计讨论”是基线创建前的批准来源。首个提交完成后，应把 `Baseline commit` 更新为提交哈希；若创建标签，同时记录标签。此记录不伪造不存在的 Issue、PR 或会议链接。
+“项目设计讨论”是基线创建前的批准来源。首个基线提交已经创建并回填哈希；本轮未创建可选标签。此记录不伪造不存在的 Issue、PR 或会议链接。
 
 ## 独立评审处置
 
