@@ -13,12 +13,14 @@ ADR 记录一项重要决策当时的背景、选择、替代方案和后果。�
 - `accepted` ADR 原则上不改写决策；新决定通过 `Supersedes` 取代旧 ADR。
 - 旧 ADR 被取代后仍保留，并标记 `superseded` 与 `Superseded by`。
 - `accepted` 只表示允许据此实现；验证落地后才能标记 `implemented`。
-- 状态变更必须有维护者明确决定，不能因代码已经写出而倒推批准。
+- 状态变更必须由有权决定的一方明确作出，不能因代码已经写出而倒推批准。纯技术决定可以由开发 agent 依据维护者委托权作出；产品方向、费用、外部服务、扩大权限和不可逆影响仍必须由维护者决定。
 - ADR 元数据必须记录 Proposed/Accepted 日期、具体 Decider、批准记录、评审者和验证负责人；不能只写泛化角色。
 - `Approval record` 优先链接 Issue、PR、评审记录或基线提交。基线提交创建前可以链接仓库内评审记录并明确 `commit pending`，不得伪造外部证据。
 - 高风险或可能过时的决策可以设置 `Review by`；没有复审期限时写 `none`。
 
 完整流程见 [DESIGN_PROCESS.md](../DESIGN_PROCESS.md)。
+
+维护者无需理解 ADR 才能参与项目。需要维护者决定时，必须另外按照 [维护者沟通与审批规则](../MAINTAINER_COMMUNICATION.md) 提供普通中文摘要、推荐方案和影响；不得把 ADR 本身当作审批问题。
 
 ## 决策索引
 

@@ -12,7 +12,7 @@
 
 维护者已接受 Design Baseline 0.1、独立评审处置、ADR-0009 至 ADR-0011 与错误模型。Gate 0 关闭，允许开始 Gate 1 的设计与工程准备。
 
-创建正式 workspace、提交正式锁文件或安装正式产品依赖前，仍必须接受 `ENGINEERING_BASELINE.md`，固定精确 Node、pnpm、Electron、CI runner 和目标架构。接受前可以继续版本调研；隔离、可丢弃的验证原型还需要维护者单独授权。其余后续 Gate 阻断项继续以 `OPEN_ITEMS.md` 为准。
+创建正式 workspace、提交正式锁文件或安装正式产品依赖前，仍必须接受 `ENGINEERING_BASELINE.md`，固定精确 Node、pnpm、Electron、CI runner 和目标架构。接受前可以继续版本调研和设计隔离、可丢弃的验证原型；真正下载依赖、使用云 CI 或远程设备时需要对应外部操作权限。其余后续 Gate 阻断项继续以 `OPEN_ITEMS.md` 为准。
 
 ## 决策记录
 
@@ -27,6 +27,9 @@
 | 2026-08-21 | 接受 ADR-0009、ADR-0010、ADR-0011 与 `ERROR_MODEL.md` | zhangchonghao | 维护者明确回复“我审阅了，同意” | accepted，implementation pending |
 | 2026-08-21 | 关闭 Gate 0，授权开始 Gate 1 设计与工程准备 | zhangchonghao | 本评审记录与 `OPEN_ITEMS.md` 中继续有效的工程基线阻断项 | granted |
 | 2026-08-21 | 采纳进一步 review 的工程基线循环、Gate 1 安全切片、状态拆分和结果确定性问题 | zhangchonghao | 维护者要求“根据意见修复”；ADR-0012 仍需单独决定 | accepted remediation; decision pending for ADR-0012 |
+| 2026-08-21 | 既定产品范围内的日常技术决策委托给开发 agent | zhangchonghao | 维护者指示“由你负责技术决策；涉及产品方向、费用或外部权限时再问我”，并要求后续 agent 使用其能理解的审批沟通 | accepted delegated authority |
+
+委托范围和后续沟通格式见 [维护者沟通与审批规则](../MAINTAINER_COMMUNICATION.md)。该委托不允许 agent 改变产品方向、承诺费用、操作外部账号/服务、扩大权限或执行不可逆动作；这些事项仍需维护者知情决定。
 
 “项目设计讨论”是基线创建前的批准来源。首个基线提交已经创建并回填哈希；本轮未创建可选标签。此记录不伪造不存在的 Issue、PR 或会议链接。
 
@@ -79,4 +82,4 @@
 
 2026-08-21，维护者 zhangchonghao 授权开始 Gate 1 的设计与工程准备。允许范围包括工程基线定版、边界检查设计、CI 设计与最小工程骨架准备。
 
-在 `ENGINEERING_BASELINE.md` 被接受前，不得创建正式 workspace、提交正式锁文件或安装正式产品依赖。为形成接受证据，维护者可以单独授权在隔离环境执行可丢弃验证原型；原型不得直接合入。Gate 1 退出前仍必须实现并验证架构边界检查、安全配置、Contract Gateway 最小闭环和三平台 CI。
+在 `ENGINEERING_BASELINE.md` 被接受前，不得创建正式 workspace、提交正式锁文件或安装正式产品依赖。为形成接受证据，可以在隔离环境设计并执行范围已记录的可丢弃验证原型；涉及下载、云 CI 或远程设备时必须取得对应外部操作权限，且原型不得直接合入。Gate 1 退出前仍必须实现并验证架构边界检查、安全配置、Contract Gateway 最小闭环和三平台 CI。

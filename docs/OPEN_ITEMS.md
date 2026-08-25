@@ -23,7 +23,7 @@ Gate 1 当前责任分配：Accountable/Implementation owner、Engineering basel
 | ADR-0012 副作用结果确定性模型 | Contract Gateway 实现前 | proposed | not-started | zhangchonghao | zhangchonghao | ERROR_MODEL 与 Gateway 结果 Schema |
 | `ERROR_MODEL.md` | Contract Gateway 实现前 | accepted | validation-pending | zhangchonghao | zhangchonghao | ADR-0012 与三个纸面例证 |
 | `ENGINEERING_BASELINE.md` 三平台工程验证基线 | 正式工程骨架前 | draft | researching | zhangchonghao | zhangchonghao | 正式 workspace、锁文件、产品依赖与 CI workflow |
-| 可丢弃工具链验证原型流程 | 工程基线接受前 | accepted | not-started | zhangchonghao | zhangchonghao | 原型执行需单独授权；只生成工程基线证据 |
+| 可丢弃工具链验证原型流程 | 工程基线接受前 | accepted | not-started | zhangchonghao | zhangchonghao | 下载、云 CI 或远程设备需对应外部操作权限；只生成工程基线证据 |
 | `threat-model/GATE1_HOST_GATEWAY.md` | Contract Gateway 实现前 | draft | in-progress | zhangchonghao | zhangchonghao | Host Bridge 与 Contract Gateway 实现 |
 | 架构边界自动检查规则 | Gate 1 退出前 | accepted | not-started | zhangchonghao | zhangchonghao | Gate 1 退出 |
 | `specs/HOST_VERTICAL_SLICE.md` | Gate 2 实现前 | draft | not-started | zhangchonghao | unassigned | Gate 2 |
@@ -48,7 +48,7 @@ Gate 1 当前责任分配：Accountable/Implementation owner、Engineering basel
 ## 维护规则
 
 - 新发现的设计前置项必须登记最迟完成 Gate、负责人和阻断对象。
-- 进入某个 Gate 前，所有阻断该 Gate 的事项必须达到要求状态，或由维护者通过 ADR 明确延后。
+- 进入某个 Gate 前，所有阻断该 Gate 的事项必须达到要求状态，或由有权决定的一方通过 ADR 明确延后；延后若影响产品范围、公开支持、费用、外部服务、权限或不可逆操作，必须由维护者决定。
 - `accepted` 只说明设计允许实施；只有可执行验证完成后才改为 `implemented`。
 - 不得用 `unassigned` 跨过对应 Gate；开始相应工作前必须落实到具体人员。
 - 完成或延后事项时同步更新本表、ROADMAP 和对应文档，避免三者漂移。

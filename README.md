@@ -4,7 +4,7 @@ ZTools vNext 是一个从零设计的跨平台效率工具与插件平台，目�
 
 ## 当前状态
 
-**Design Baseline 0.1 已接受，Gate 0 已关闭，Gate 1 已获准开始。** 仓库尚未开始工程实现；创建正式 workspace、提交正式锁文件或安装正式产品依赖前，仍需接受 [三平台工程验证基线](docs/ENGINEERING_BASELINE.md)，固定 Node、pnpm、Electron、CI runner 和目标架构。接受前允许经维护者明确授权，在隔离环境运行可丢弃的技术验证原型。文档中的 `accepted` 表示设计已经批准，不表示功能已经实现。
+**Design Baseline 0.1 已接受，Gate 0 已关闭，Gate 1 已获准开始。** 仓库尚未开始工程实现；创建正式 workspace、提交正式锁文件或安装正式产品依赖前，仍需接受 [三平台工程验证基线](docs/ENGINEERING_BASELINE.md)，固定 Node、pnpm、Electron、CI runner 和目标架构。接受前可以设计隔离、可丢弃的技术验证原型；真正下载依赖、使用云 CI 或远程设备时，必须取得对应的外部操作权限。文档中的 `accepted` 表示设计已经批准，不表示功能已经实现。
 
 本项目不从旧 ZTools 继承架构。旧项目只作为行为、需求、失败经验、兼容数据和测试场景的只读资料来源。
 
@@ -24,6 +24,7 @@ ZTools vNext 是一个从零设计的跨平台效率工具与插件平台，目�
 - [产品边界](docs/PRODUCT.md)
 - [术语表](docs/GLOSSARY.md)
 - [设计变更流程](docs/DESIGN_PROCESS.md)
+- [维护者沟通与审批规则](docs/MAINTAINER_COMMUNICATION.md)
 - [Baseline 0.1 评审记录](docs/reviews/BASELINE-0.1.md)
 - [开放事项与 Gate 阻断关系](docs/OPEN_ITEMS.md)
 - [安全模型](docs/SECURITY.md)
