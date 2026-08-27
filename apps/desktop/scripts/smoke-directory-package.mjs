@@ -78,8 +78,10 @@ const packageDirectory = join(artifactRoot, target.artifactName);
 const executable = join(packageDirectory, resolvePackagedExecutable(target));
 const platformArguments =
   process.platform === "linux" && process.env["XDG_SESSION_TYPE"] === "wayland"
-    ? ["--ozone-platform=wayland", "--disable-vulkan"]
-    : [];
+    ? ["--ozone-platform=wayland", "--disable-vulkan", "--no-sandbox"]
+    : process.platform === "linux"
+      ? ["--no-sandbox"]
+      : [];
 let stdout = "";
 let stderr = "";
 let outputFailure;

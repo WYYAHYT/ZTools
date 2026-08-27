@@ -56,6 +56,7 @@ async function stageApplication() {
           name: "ztools-vnext",
           productName: applicationName,
           version: "0.0.0",
+          author: "ZTools Contributors",
           private: true,
           type: "module",
           main: "dist/main/main.js",
