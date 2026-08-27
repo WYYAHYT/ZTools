@@ -44,7 +44,7 @@ jobs:
         run: corepack pnpm@11.24.0 --filter @ztools/desktop run package:directory
       - name: Smoke platform-native directory artifact (Linux virtual display)
         if: runner.os == 'Linux'
-        run: xvfb-run --auto-servernum corepack pnpm@11.24.0 --filter @ztools/desktop run smoke:directory
+        run: env ZTOOLS_XVFB_SMOKE=1 xvfb-run --auto-servernum corepack pnpm@11.24.0 --filter @ztools/desktop run smoke:directory
       - name: Smoke platform-native directory artifact
         if: runner.os != 'Linux'
         run: corepack pnpm@11.24.0 --filter @ztools/desktop run smoke:directory

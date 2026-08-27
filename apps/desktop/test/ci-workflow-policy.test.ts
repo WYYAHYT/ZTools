@@ -143,6 +143,7 @@ describe("CI workflow policy", () => {
       ),
     ).toMatchObject({
       if: "runner.os == 'Linux'",
+      run: "env ZTOOLS_XVFB_SMOKE=1 xvfb-run --auto-servernum corepack pnpm@11.24.0 --filter @ztools/desktop run smoke:directory",
     });
     expect(
       requireStep("Smoke platform-native directory artifact"),
