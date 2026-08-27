@@ -1,0 +1,86 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [vnext]
+
+permissions:
+  contents: read
+
+jobs:
+  checks:
+    name: Checks (${{ matrix.os }})
+    timeout-minutes: 20
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-26.04, windows-2025, macos-26]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+      - name: Use Node.js 24.18.0
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: 24.18.0
+      - name: Check pnpm
+        run: corepack pnpm@11.24.0 --version
+      - name: Verify runner platform and architecture
+        run: node apps/desktop/scripts/verify-ci-platform.mjs
+      - name: Install dependencies
+        run: corepack pnpm@11.24.0 install --frozen-lockfile
+      - name: Static and unit checks
+        run: corepack pnpm@11.24.0 run check
+      - name: Build desktop
+        run: corepack pnpm@11.24.0 --filter @ztools/desktop run build
+      - name: Electron E2E (Linux virtual display)
+        if: runner.os == 'Linux'
+        run: xvfb-run --auto-servernum corepack pnpm@11.24.0 run test:e2e
+      - name: Electron E2E
+        if: runner.os != 'Linux'
+        run: corepack pnpm@11.24.0 run test:e2e
+      - name: Build platform-native directory artifact
+        run: corepack pnpm@11.24.0 --filter @ztools/desktop run package:directory
+      - name: Smoke platform-native directory artifact (Linux virtual display)
+        if: runner.os == 'Linux'
+        run: xvfb-run --auto-servernum corepack pnpm@11.24.0 --filter @ztools/desktop run smoke:directory
+      - name: Smoke platform-native directory artifact
+        if: runner.os != 'Linux'
+        run: corepack pnpm@11.24.0 --filter @ztools/desktop run smoke:directory
+      - name: Upload Electron E2E failure evidence
+        if: failure()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: electron-e2e-${{ matrix.os }}
+          path: test-results/electron
+          if-no-files-found: ignore
+          retention-days: 7
+      - name: Upload directory artifact smoke diagnostics
+        if: failure()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: directory-smoke-${{ matrix.os }}
+          path: artifacts/desktop-directory-smoke/diagnostics.json
+          if-no-files-found: ignore
+          retention-days: 7
+
+  ubuntu-wayland-smoke:
+    name: Ubuntu Wayland smoke
+    timeout-minutes: 15
+    runs-on: [self-hosted, linux, x64, ztools-ubuntu-26.04-wayland]
+    needs: checks
+    if: ${{ vars.ZTOOLS_WAYLAND_RUNNER == 'true' }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+      - name: Use Node.js 24.18.0
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: 24.18.0
+      - name: Verify runner platform and architecture
+        run: node apps/desktop/scripts/verify-ci-platform.mjs
+      - name: Install dependencies
+        run: corepack pnpm@11.24.0 install --frozen-lockfile
+      - name: Build and run smoke test
+        run: corepack pnpm@11.24.0 --filter @ztools/desktop run smoke:wayland

@@ -2,7 +2,7 @@
 
 - Status: accepted
 - Baseline: 0.1
-- Last updated: 2026-08-21
+- Last updated: 2026-08-26
 
 本文件是尚未完成的设计、决策和治理交付物的统一登记。它不代替对应文档；各 Gate 开始前必须检查本表，不能只依赖全文搜索。
 
@@ -17,17 +17,20 @@ Gate 1 当前责任分配：Accountable/Implementation owner、Engineering basel
 | `ROADMAP.md` | Gate 1 前 | accepted | completed | zhangchonghao | zhangchonghao | completed |
 | `ARCHITECTURE.md` | Gate 1 前 | accepted | completed | zhangchonghao | zhangchonghao | completed |
 | `PLATFORM_CAPABILITIES.md` | Gate 1 前 | accepted | completed | zhangchonghao | zhangchonghao | completed |
-| ADR-0009 工程技术栈 | 正式工程骨架前 | accepted | validation-pending | zhangchonghao | zhangchonghao | 精确版本与平台证据由工程基线阻断 |
-| ADR-0010 Contract、身份绑定与协议所有权 | Contract Gateway 实现前 | accepted | validation-pending | zhangchonghao | zhangchonghao | Gate 1 Gateway 切片与实施验证 |
-| ADR-0011 Capability 多维状态 | Capability Registry 实现前 | accepted | validation-pending | zhangchonghao | zhangchonghao | Capability Contract 实施验证 |
-| ADR-0012 副作用结果确定性模型 | Contract Gateway 实现前 | proposed | not-started | zhangchonghao | zhangchonghao | ERROR_MODEL 与 Gateway 结果 Schema |
-| `ERROR_MODEL.md` | Contract Gateway 实现前 | accepted | validation-pending | zhangchonghao | zhangchonghao | ADR-0012 与三个纸面例证 |
-| `ENGINEERING_BASELINE.md` 三平台工程验证基线 | 正式工程骨架前 | draft | researching | zhangchonghao | zhangchonghao | 正式 workspace、锁文件、产品依赖与 CI workflow |
-| 可丢弃工具链验证原型流程 | 工程基线接受前 | accepted | not-started | zhangchonghao | zhangchonghao | 下载、云 CI 或远程设备需对应外部操作权限；只生成工程基线证据 |
-| `threat-model/GATE1_HOST_GATEWAY.md` | Contract Gateway 实现前 | draft | in-progress | zhangchonghao | zhangchonghao | Host Bridge 与 Contract Gateway 实现 |
-| 架构边界自动检查规则 | Gate 1 退出前 | accepted | not-started | zhangchonghao | zhangchonghao | Gate 1 退出 |
-| `specs/HOST_VERTICAL_SLICE.md` | Gate 2 实现前 | draft | not-started | zhangchonghao | unassigned | Gate 2 |
-| `audits/LEGACY_BEHAVIOR.md` | Gate 2 实现前 | draft | not-started | zhangchonghao | unassigned | Gate 2 范围确认 |
+| ADR-0009 工程技术栈 | 正式工程骨架前 | accepted | validation-pending | zhangchonghao | zhangchonghao | 精确版本、正式 workspace、Linux 原生目录产物构建/启动和三平台 CI 产物 smoke 配置已完成；Windows/macOS CI 实施证据待完成 |
+| ADR-0010 Contract、身份绑定与协议所有权 | Contract Gateway 实现前 | accepted | in-progress | zhangchonghao | zhangchonghao | 本地 Gateway 与 Electron 导航/reload E2E 已验证；Windows/macOS CI 和目标平台证据待完成 |
+| ADR-0011 Capability 多维状态 | Capability Registry 实现前 | accepted | verified | zhangchonghao | zhangchonghao | Launcher Visibility 与 Previous App Focus 已使用独立 ID、五维状态 Contract、Fake Adapter 和降级组合完成本地验证；真实平台 Adapter 证据仍属于 Gate 2 门禁 |
+| ADR-0012 副作用结果确定性模型 | Contract Gateway 实现前 | accepted | in-progress | zhangchonghao | zhangchonghao | 600 个 effect/category/outcome/retryability 组合已穷举，Bootstrap/Search/Action/Visibility Gateway 已统一校验；持久幂等键、执行 ID 与独立状态查询随首个持久写契约完成 |
+| `ERROR_MODEL.md` | Contract Gateway 实现前 | accepted | in-progress | zhangchonghao | zhangchonghao | 只读与当前 Host 写方法的错误信封、取消、超时、输出 Schema、unknown/query-status-first 已验证；通用持久写恢复仍待对应纵向切片 |
+| `ENGINEERING_BASELINE.md` 三平台工程验证基线 | 正式工程骨架前 | accepted | in-progress | zhangchonghao | zhangchonghao | 正式 workspace、Ubuntu 源码/Wayland smoke、Linux 原生目录产物启动与默认拒绝网络策略已通过；Electron 44 Wayland/Vulkan 警告已精确分类并对其他错误默认失败；三平台 CI 实跑与 Windows/macOS 启动仍待完成 |
+| 可丢弃工具链验证原型流程 | 工程基线接受前 | accepted | completed | zhangchonghao | zhangchonghao | Ubuntu Wayland、构建和目录产物证据已记录；正式应用验证仍独立进行 |
+| `threat-model/GATE1_HOST_GATEWAY.md` | Contract Gateway 实现前 | accepted | validation-pending | zhangchonghao | zhangchonghao | 本地负向测试、无原型 JSON 重建/危险键拒绝、E2E、脱敏、安全回退、4096 次连接压力和 Renderer 两次有界本地恢复/预算耗尽退出已通过；Windows/macOS CI 和目标平台证据待完成 |
+| 架构边界自动检查规则 | Gate 1 退出前 | accepted | verified | zhangchonghao | zhangchonghao | dependency-cruiser 已执行包方向、环和 Electron 导入规则 |
+| ADR-0013 Host Search 有界事件流 | Gate 2 实现前 | accepted | verified | zhangchonghao | zhangchonghao | 本地事件流、ack、背压、跨连接拒绝、reload/撤销清理已验证；三平台证据仍属于 Gate 2 退出门禁 |
+| `specs/HOST_VERTICAL_SLICE.md` | Gate 2 实现前 | accepted | validation-pending | zhangchonghao | zhangchonghao | 本地 Host Slice、单实例桌面入口召回、Renderer 崩溃有界安全恢复、独立 Electron Launcher Adapter、组合框/live region/alert、forced-colors、200% 缩放、Ubuntu/Electron 召回 p95，以及 GNOME 50.1 隔离 Shell/Wayland 的协议、服务生命周期和 Shell 重启链路已验证；真实窗口恢复仍需正常 GNOME 会话证据。原生全局快捷键不在当前切片，Windows/macOS、正常 GNOME 用户会话、多显示器、人工辅助技术复查和 Gate 1 未完成项仍阻断完整 Gate 2 |
+| `audits/LEGACY_BEHAVIOR.md` | Gate 2 实现前 | accepted | completed | zhangchonghao | zhangchonghao | 首个 Host Slice 行为审计完成；插件深入审计延后 Gate 3，数据迁移样本延后 Gate 5 |
+| `threat-model/GATE2_HOST_SEARCH.md` | Gate 2 实现前 | accepted | validation-pending | zhangchonghao | zhangchonghao | 本地威胁控制、组合框语义和 Ubuntu/Electron 召回性能已验证；真实平台 Adapter、辅助技术和完整平台证据待完成 |
+| ADR-0014 GNOME Shell 扩展组件协议与认证 | 首个 GNOME Shell 扩展实现前 | accepted | validation-pending | zhangchonghao | zhangchonghao | 最小恢复方法、窗口销毁/工作区变化清理、受限 Host 重启接管、重放/速率/epoch 边界、固定 D-Bus 接口和 Main Transport 已实现；GNOME 50.1 隔离 headless Shell/Wayland 已稳定验证加载、撤销、轮换和 Shell PID 重启后的旧 client 撤销，候选清理有状态机测试；真实焦点恢复及当前用户正常桌面的安装/启用、Shell restart、工作区、多显示器与辅助技术证据仍待完成 |
 | `PERMISSION_UX.md` | Gate 3 实现前 | — | not-started | zhangchonghao | unassigned | 敏感插件能力 |
 | `DATA_OWNERSHIP.md` | Gate 3 实现前 | — | not-started | zhangchonghao | unassigned | 插件存储、卸载与迁移 |
 | `COMPATIBILITY.md` | Gate 3 实现前 | — | not-started | zhangchonghao | unassigned | 首个公开插件协议 |

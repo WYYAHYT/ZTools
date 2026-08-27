@@ -1,0 +1,43 @@
+{
+  "name": "ztools-vnext",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "packageManager": "pnpm@11.24.0",
+  "engines": {
+    "node": "24.18.0"
+  },
+  "scripts": {
+    "build": "corepack pnpm@11.24.0 -r --if-present run build",
+    "check": "corepack pnpm@11.24.0 run format:check && corepack pnpm@11.24.0 run typecheck && corepack pnpm@11.24.0 run lint && corepack pnpm@11.24.0 run test && corepack pnpm@11.24.0 run test:pressure && corepack pnpm@11.24.0 run architecture:check && corepack pnpm@11.24.0 run security:check",
+    "dev": "corepack pnpm@11.24.0 --filter @ztools/desktop run dev",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "typecheck": "corepack pnpm@11.24.0 -r --if-present run typecheck",
+    "lint": "eslint . --max-warnings=0",
+    "test": "vitest run",
+    "test:e2e": "corepack pnpm@11.24.0 --filter @ztools/desktop run build && playwright test",
+    "test:pressure": "vitest run --config vitest.pressure.config.ts",
+    "test:watch": "vitest",
+    "architecture:check": "depcruise --config dependency-cruiser.config.cjs apps packages",
+    "security:check": "node apps/desktop/scripts/check-security.mjs",
+    "start:wayland": "corepack pnpm@11.24.0 --filter @ztools/desktop run start:wayland"
+  },
+  "devDependencies": {
+    "@eslint/js": "9.39.5",
+    "@playwright/test": "1.62.1",
+    "@types/js-yaml": "4.0.9",
+    "@types/node": "24.10.1",
+    "@vitest/coverage-v8": "4.1.11",
+    "dependency-cruiser": "18.2.0",
+    "esbuild": "0.28.2",
+    "eslint": "9.39.5",
+    "eslint-plugin-vue": "10.6.2",
+    "js-yaml": "4.3.1",
+    "prettier": "3.9.6",
+    "typescript": "5.9.3",
+    "typescript-eslint": "8.52.0",
+    "vitest": "4.1.11",
+    "vue-eslint-parser": "10.4.0"
+  }
+}

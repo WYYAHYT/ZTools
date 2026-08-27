@@ -12,7 +12,7 @@
 
 维护者已接受 Design Baseline 0.1、独立评审处置、ADR-0009 至 ADR-0011 与错误模型。Gate 0 关闭，允许开始 Gate 1 的设计与工程准备。
 
-创建正式 workspace、提交正式锁文件或安装正式产品依赖前，仍必须接受 `ENGINEERING_BASELINE.md`，固定精确 Node、pnpm、Electron、CI runner 和目标架构。接受前可以继续版本调研和设计隔离、可丢弃的验证原型；真正下载依赖、使用云 CI 或远程设备时需要对应外部操作权限。其余后续 Gate 阻断项继续以 `OPEN_ITEMS.md` 为准。
+此处记录的是 2026-08-21 关闭 Gate 0 时的结论：当时创建正式 workspace 仍受 `ENGINEERING_BASELINE.md` 阻断。该工程基线已于 2026-08-26 根据隔离原型证据接受，现已允许创建正式 workspace、提交正式锁文件和安装正式产品依赖；Windows/macOS 目标平台证据仍保留为 Gate 1 退出条件。其余后续 Gate 阻断项继续以 `OPEN_ITEMS.md` 为准。
 
 ## 决策记录
 
@@ -28,6 +28,9 @@
 | 2026-08-21 | 关闭 Gate 0，授权开始 Gate 1 设计与工程准备 | zhangchonghao | 本评审记录与 `OPEN_ITEMS.md` 中继续有效的工程基线阻断项 | granted |
 | 2026-08-21 | 采纳进一步 review 的工程基线循环、Gate 1 安全切片、状态拆分和结果确定性问题 | zhangchonghao | 维护者要求“根据意见修复”；ADR-0012 仍需单独决定 | accepted remediation; decision pending for ADR-0012 |
 | 2026-08-21 | 既定产品范围内的日常技术决策委托给开发 agent | zhangchonghao | 维护者指示“由你负责技术决策；涉及产品方向、费用或外部权限时再问我”，并要求后续 agent 使用其能理解的审批沟通 | accepted delegated authority |
+| 2026-08-26 | 接受 ADR-0012：用与错误类别正交的 `effectOutcome` 表达副作用确定性 | development agent under delegated technical authority | 该决定不改变产品范围、平台承诺、费用或权限；它明确超时、断线和崩溃后的安全恢复语义 | accepted; implementation pending |
+| 2026-08-26 | 接受 Gate 1 Host Renderer/Contract Gateway 威胁模型切片 | development agent under delegated technical authority | 已固定最小方法与角色矩阵、连接生命周期、消息和资源上限、负向控制及三类副作用例证；不扩大产品权限 | accepted; validation pending |
+| 2026-08-26 | 接受 Gate 1 工程基线并允许创建正式 workspace | development agent under delegated technical authority | 隔离原型已验证精确工具版本、Ubuntu 26.04 原生 Wayland 启动、安全配置与目录产物；Windows/macOS 启动和 E2E 保留为 Gate 1 退出阻断 | accepted; implementation pending |
 
 委托范围和后续沟通格式见 [维护者沟通与审批规则](../MAINTAINER_COMMUNICATION.md)。该委托不允许 agent 改变产品方向、承诺费用、操作外部账号/服务、扩大权限或执行不可逆动作；这些事项仍需维护者知情决定。
 
@@ -43,11 +46,11 @@
 | Gate 1 关键设计缺失 | 登记 Gate 1 阻断项，建立 ADR-0009、ADR-0010 与错误模型 | 三者已接受；实施验证仍待 Gate 1 完成 |
 | 依赖方向和契约所有权有歧义 | 增加依赖矩阵、所有权和禁止依赖 | ARCHITECTURE 与 ADR-0010 已接受；自动边界检查尚未实现 |
 | Capability 状态不是单一维度 | 建立 ADR-0011 比较多轴模型 | ADR-0011 与 PLATFORM_CAPABILITIES 已接受；实现验证待完成 |
-| 技术栈被错误打包进 ADR-0001 | ADR-0001 只保留从零模块化单体，技术栈交由 ADR-0009 | ADR-0009 已接受；精确版本由 ENGINEERING_BASELINE 阻断 |
+| 技术栈被错误打包进 ADR-0001 | ADR-0001 只保留从零模块化单体，技术栈交由 ADR-0009 | ADR-0009 已接受；精确版本已由 2026-08-26 接受的 ENGINEERING_BASELINE 固定 |
 | 产品缺少可验收规格 | 不在 Gate 0 猜测指标，建立 Gate 2 前阻断交付物 | HOST_VERTICAL_SLICE 模板已建立，仍为 draft/not-started |
-| 安全文档不是完整威胁模型 | 新增跨 Gate 威胁模型并按功能切片补齐 | 总模型为 draft；Gate 1 Host Gateway 切片已建立、待接受 |
+| 安全文档不是完整威胁模型 | 新增跨 Gate 威胁模型并按功能切片补齐 | 总模型为 draft；Gate 1 Host Gateway 切片已于 2026-08-26 接受，实施验证待完成 |
 | 开放事项缺少统一登记 | 新增 OPEN_ITEMS | 已建立，并进一步拆分设计状态与执行进度 |
-| 平台 CI 基线不具体 | 作为正式工程骨架前阻断项，固定 runner、OS、CPU 和 Electron 窗口 | ENGINEERING_BASELINE 为 draft/researching；允许授权后运行可丢弃验证原型 |
+| 平台 CI 基线不具体 | 作为正式工程骨架前阻断项，固定 runner、OS、CPU 和 Electron 窗口 | ENGINEERING_BASELINE 已于 2026-08-26 接受；三平台正式 CI 和启动证据待实施 |
 | ADR 批准可追溯性弱 | 扩充 ADR 元数据并链接本记录 | 已完成；accepted ADR 指向 baseline `3a5ad77` |
 | 旧项目行为知识未成为交付物 | 登记 Gate 2 前的只读行为审计 | LEGACY_BEHAVIOR 模板已建立，仍为 draft/not-started |
 | PRODUCT 旧插件表述过时 | 改为首阶段不直接运行旧插件 | 已完成并接受 |
@@ -56,13 +59,13 @@
 
 | 评审意见 | 处置 | 当前结果 |
 | --- | --- | --- |
-| 工程基线接受条件形成循环 | 允许维护者授权隔离、可丢弃的验证原型；正式 workspace 仍受工程基线阻断 | 循环已解除；ENGINEERING_BASELINE 保持 draft/researching，尚未授权执行原型 |
-| Gate 1 威胁模型阻断登记不完整 | 建立 Host Renderer/Contract Gateway 专用切片，并登记到 OPEN_ITEMS 与 ROADMAP | 切片为 draft/in-progress；接受前阻断 Gateway 实现 |
+| 工程基线接受条件形成循环 | 允许维护者授权隔离、可丢弃的验证原型；正式 workspace 仍受工程基线阻断 | 循环已解除；原型获授权并完成，ENGINEERING_BASELINE 已于 2026-08-26 接受 |
+| Gate 1 威胁模型阻断登记不完整 | 建立 Host Renderer/Contract Gateway 专用切片，并登记到 OPEN_ITEMS 与 ROADMAP | 切片已于 2026-08-26 接受；实现和负向验证待完成 |
 | Gate 1 负责人未具体化 | 为 implementation、工程基线验证、Gateway 验证和安全评审指定具体负责人 | Gate 1 相关责任均由 zhangchonghao 承担 |
 | 基线记录与威胁登记保留旧时态 | 区分“当时处置决定”和“当前结果”，更新 accepted/未验证证据表述 | 已完成 |
 | OPEN_ITEMS 混用设计状态和工作进度 | 拆成设计状态、执行进度、Accountable owner 与 Verification owner | 已完成；未创建文档使用 `—`，不提前宣称 draft |
 | Application 依赖描述过于绝对 | 使层级简述与包级依赖矩阵一致 | 已明确可依赖本模块 Domain、owned Ports 和必要 Public Module Contract |
-| `outcome-unknown` 与 category 关系不明确 | 建立 ADR-0012 比较正交 `effectOutcome` 模型 | ADR-0012 为 proposed，尚未改变现行 ERROR_MODEL，阻断 Gateway 结果 Schema |
+| `outcome-unknown` 与 category 关系不明确 | 建立 ADR-0012 比较正交 `effectOutcome` 模型 | ADR-0012 已接受；ERROR_MODEL 已同步，Gateway 结果 Schema 与组合测试仍待实现验证 |
 
 ## Gate 0 关闭清单
 

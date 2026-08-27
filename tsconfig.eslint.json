@@ -1,0 +1,17 @@
+{
+  "extends": "./tsconfig.base.json",
+  "compilerOptions": {
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
+    "noEmit": true
+  },
+  "include": [
+    "apps/**/*.ts",
+    "apps/**/*.mts",
+    "apps/**/*.vue",
+    "packages/**/*.ts",
+    "playwright.config.ts",
+    "vitest.pressure.config.ts",
+    "vitest.config.ts"
+  ]
+}

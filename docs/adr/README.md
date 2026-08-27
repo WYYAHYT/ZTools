@@ -37,7 +37,9 @@ ADR 记录一项重要决策当时的背景、选择、替代方案和后果。�
 | [0009](0009-engineering-technology-stack.md) | 工程技术栈 | accepted |
 | [0010](0010-contract-schema-identity-ownership.md) | Contract Schema、连接身份与协议所有权 | accepted |
 | [0011](0011-multidimensional-capability-state.md) | Capability 多维状态模型 | accepted |
-| [0012](0012-effect-outcome-certainty.md) | 副作用结果确定性模型 | proposed |
+| [0012](0012-effect-outcome-certainty.md) | 副作用结果确定性模型 | accepted |
+| [0013](0013-host-search-session-stream.md) | Host 搜索使用连接绑定的有界事件流 | accepted |
+| [0014](0014-gnome-shell-extension-protocol.md) | GNOME Shell 扩展使用最小化焦点恢复协议 | accepted |
 
 ## 首批范围决策
 
@@ -45,4 +47,8 @@ ADR-0006、ADR-0007 与 ADR-0008 已由维护者接受。它们确定了首阶�
 
 ADR-0009、ADR-0010 与 ADR-0011 源自独立评审指出的 Gate 1 缺口，已由维护者接受。它们允许进入 Gate 1 设计与工程准备，但不代表对应实现已经完成。
 
-ADR-0012 源自进一步评审对 `outcome-unknown` 的语义澄清，在维护者接受前不改变当前 ERROR_MODEL；它阻断 Contract Gateway 结果信封实现。
+ADR-0012 源自进一步评审对 `outcome-unknown` 的语义澄清，已接受以正交 `effectOutcome` 表达副作用确定性；600 个组合的核心矩阵和当前 Host Gateway 已实施验证，持久幂等键、执行 ID 与独立状态查询随首个持久写契约完成。
+
+ADR-0013 已在既定产品边界内按委托技术权限接受，规定 Gate 2 Host Search 使用有界、连接绑定的事件流；Host Vertical Slice 规格和 Gate 2 威胁模型接受前仍不得实现。
+
+ADR-0014 已在 ADR-0007 接受的可选 GNOME Shell 扩展范围内按委托技术权限接受，规定扩展只维护并恢复 Shell 内部记录的前一窗口，不接受任意目标窗口或通用 Shell 操作；协议客户端、扩展、Main Transport 和 GNOME 50.1 隔离 Shell/Wayland 焦点纵向链路已实现并验证，当前用户正常桌面的安装、启用、多显示器与 Shell restart 证据仍未完成。

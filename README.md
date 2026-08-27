@@ -4,7 +4,7 @@ ZTools vNext 是一个从零设计的跨平台效率工具与插件平台，目�
 
 ## 当前状态
 
-**Design Baseline 0.1 已接受，Gate 0 已关闭，Gate 1 已获准开始。** 仓库尚未开始工程实现；创建正式 workspace、提交正式锁文件或安装正式产品依赖前，仍需接受 [三平台工程验证基线](docs/ENGINEERING_BASELINE.md)，固定 Node、pnpm、Electron、CI runner 和目标架构。接受前可以设计隔离、可丢弃的技术验证原型；真正下载依赖、使用云 CI 或远程设备时，必须取得对应的外部操作权限。文档中的 `accepted` 表示设计已经批准，不表示功能已经实现。
+**Design Baseline 0.1 与 Gate 1 工程基线已接受，Gate 0 已关闭，Gate 1 正在实施。** 隔离原型已经验证精确 Node、pnpm、Electron、Vue、TypeScript 组合和 Ubuntu 26.04 原生 Wayland 安全窗口，允许创建正式 workspace、锁文件和工程骨架。Windows/macOS 目标平台启动、E2E 与三平台 CI 仍是 Gate 1 退出条件，不能由 Linux 交叉打包替代。文档中的 `accepted` 表示设计已经批准，不表示功能已经实现。
 
 本项目不从旧 ZTools 继承架构。旧项目只作为行为、需求、失败经验、兼容数据和测试场景的只读资料来源。
 
@@ -30,6 +30,7 @@ ZTools vNext 是一个从零设计的跨平台效率工具与插件平台，目�
 - [安全模型](docs/SECURITY.md)
 - [威胁模型](docs/THREAT_MODEL.md)
 - [Gate 1 Host Renderer/Contract Gateway 威胁模型](docs/threat-model/GATE1_HOST_GATEWAY.md)
+- [Gate 2 Host Search/Action 威胁模型](docs/threat-model/GATE2_HOST_SEARCH.md)
 - [总体架构](docs/ARCHITECTURE.md)
 - [错误、取消与副作用结果模型](docs/ERROR_MODEL.md)
 - [插件模型](docs/PLUGIN_MODEL.md)

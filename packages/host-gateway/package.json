@@ -1,0 +1,22 @@
+{
+  "name": "@ztools/host-gateway",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "typecheck": "tsc --noEmit -p tsconfig.json"
+  },
+  "dependencies": {
+    "@sinclair/typebox": "0.34.52",
+    "@ztools/bootstrap-application": "workspace:*",
+    "@ztools/contract-kernel": "workspace:*",
+    "@ztools/host-contracts": "workspace:*",
+    "@ztools/search-application": "workspace:*",
+    "@ztools/search-domain": "workspace:*",
+    "@ztools/platform-capabilities": "workspace:*",
+    "ajv": "8.20.0"
+  }
+}

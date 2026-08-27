@@ -88,7 +88,7 @@
 
 ## 迁移与回滚
 
-当前没有实现。若原型证明某一轴需要按 Capability 扩展，可在保持多维与 Permission 分离原则下调整 Schema；改变原则需新 ADR。
+Launcher Visibility 与 Previous App Focus 已在首个 Host Slice 中作为两个独立 Capability 实现五维状态 Contract、平台无关 Port、Fake Adapter 和降级组合测试；组合动作分别返回两份快照，避免用可用的显示能力掩盖不可用的焦点恢复。真实 Windows、macOS 与 GNOME Wayland Adapter 仍待平台证据。若后续证明某一轴需要按 Capability 扩展，可在保持多维与 Permission 分离原则下调整 Schema；改变原则需新 ADR。
 
 ## 验证方式
 
@@ -99,4 +99,4 @@
 
 ## 实施记录
 
-决策已接受，尚未实施。
+已在首个 Host Slice 的 Launcher Visibility 与 Previous App Focus 契约、Fake Adapter、Gateway Schema 和 Host UI 中完成平台无关实施与本地验证；真实平台 Adapter 与系统集成验证尚未完成，因此 ADR 状态保持 `accepted`。

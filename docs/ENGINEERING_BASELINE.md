@@ -1,12 +1,15 @@
 # 三平台工程验证基线
 
-- Status: draft
+- Status: accepted
 - Baseline: 0.1
-- Last updated: 2026-08-21
+- Last updated: 2026-08-26
 - Accountable owner: zhangchonghao
 - Verification owner: zhangchonghao
+- Accepted: 2026-08-26
+- Decider: development agent under delegated technical authority
+- Approval record: [Gate 1 toolchain validation](reviews/GATE1-TOOLCHAIN-VALIDATION.md)
 
-本文件固定 Gate 1 所需的工程验证环境，不等同于最终公开支持政策。当前版本列出已知目标与待探测项；在创建正式 workspace、提交正式锁文件和安装正式产品依赖前，必须把候选项解析为精确版本并由获得委托的开发 agent 根据验证证据接受。若同时改变公开平台承诺、产生费用、使用外部账号/服务或扩大权限，仍必须由维护者决定。
+本文件固定 Gate 1 所需的工程验证环境，不等同于最终公开支持政策。当前版本已经固定正式 workspace 的精确工具版本和平台证据分层，允许创建正式 workspace、提交正式锁文件和安装正式产品依赖。Windows/macOS 目标平台启动与 E2E 仍为 Gate 1 退出阻断项；它们没有被 Ubuntu 本机或 Linux 上的交叉打包替代。
 
 为了验证候选本身，允许按本文流程在隔离、可丢弃的环境中安装依赖、运行最小构建和触发三平台 CI。验证原型不是正式工程骨架，不得直接合入 `vnext`。
 
@@ -18,13 +21,65 @@
 
 CI 通过只能证明对应 runner 范围；托管 runner 不能替代真实 Windows/macOS/GNOME Wayland 用户会话。
 
-## Gate 1 候选矩阵
+## Gate 1 平台矩阵
 
-| 平台 | CPU | 本地/真实环境 | 托管 CI 候选 | Gate 1 证据 |
+| 平台 | CPU | 本地/真实环境 | 托管 CI 基线 | Gate 1 证据 |
 | --- | --- | --- | --- | --- |
-| Ubuntu | x86_64 | Ubuntu 26.04、默认 GNOME、原生 Wayland | 实现前选择并固定可用的 Ubuntu x64 runner 镜像；若无 26.04 托管镜像，CI 编译与本机 26.04 实机证据并列 | 类型/测试/构建 + 26.04 Wayland 启动和窗口 smoke test |
-| Windows | x86_64 | Windows 11 交互式 VM；Preview 前真实设备 | 实现前从 CI 提供商当前受支持的 Windows x64 固定镜像中选择，禁止长期使用浮动 `*-latest` 作为基线 | 类型/测试/构建/基础 Electron E2E；里程碑补真实会话 |
-| macOS | arm64 优先 | Apple Silicon macOS 真实或合规远程 Mac | 实现前选择提供 arm64 的固定 macOS 镜像；若托管 CI 只能覆盖另一架构，必须明确双轨证据 | 类型/测试/构建/基础 Electron E2E；里程碑补权限、签名和真实会话 |
+| Ubuntu | x86_64 | Ubuntu 26.04、默认 GNOME、原生 Wayland | `ubuntu-26.04` x64；当前为 GitHub Actions preview，若稳定性不足并列 `ubuntu-24.04` 构建证据 | 类型/测试/构建 + 26.04 Wayland 启动和窗口 smoke test |
+| Windows | x86_64 | Windows 11 交互式 VM；Preview 前真实设备 | `windows-2025` x64 | 类型/测试/构建/基础 Electron E2E；里程碑补真实会话 |
+| macOS | arm64 优先 | Apple Silicon macOS 真实或合规远程 Mac | `macos-26` arm64 | 类型/测试/构建/基础 Electron E2E；里程碑补权限、签名和真实会话 |
+
+Runner 标签固定到明确 OS 版本，不使用 `*-latest`。2026-08-26 已通过 GitHub 官方 runner-images 清单和托管 runner 文档只读复核：`ubuntu-26.04` 为 x64 preview、`windows-2025` 为 x64、`macos-26` 为 arm64。CI 在依赖安装和临时资源分配前执行同一平台矩阵校验，标签或架构漂移会立即失败。托管镜像内部软件会按周更新，所以锁文件、Node 精确版本和构建工具仍由仓库固定；镜像更新造成的差异必须由 CI 产物记录。工作流第三方 Actions 使用只读核验的完整提交 SHA，不使用可移动主版本标签。
+
+## 正式工具链
+
+以下版本在 2026-08-26 的隔离原型中完成依赖解析、严格类型检查、生产 Renderer 构建和 Ubuntu 原生 Wayland 启动验证：
+
+| 工具 | 精确版本 | 用途与约束 |
+| --- | --- | --- |
+| Node.js | `24.18.0` | 开发与 CI；Node 24 Krypton LTS，计划维护至 2028-04-30 |
+| pnpm | `11.24.0` | workspace 和锁文件；由 `packageManager` 与 Corepack 固定 |
+| Electron | `44.0.0` | Gate 1 唯一支持版本；内含 Chromium `152.0.7977.54`、Node `24.18.1` |
+| Vue | `3.5.41` | Host Renderer UI |
+| TypeScript | `5.9.3` | 所有正式 TypeScript 包启用 strict 模式；与 ESLint 类型检查生态兼容。Electron 外部声明使用 `skipLibCheck`，业务源码仍严格检查 |
+| Vite | `8.2.2` | Host Renderer 生产构建 |
+| `@vitejs/plugin-vue` | `6.0.8` | 该版本明确声明兼容 Vite 8；旧 `6.0.1` 已在原型中因 peer 范围被否决 |
+| Vitest | `4.1.11` | Domain、Application、Contract、组件和架构测试运行器 |
+| Playwright | `1.62.1` | Electron E2E；目标平台运行证据仍待正式 workspace CI |
+| Ajv | `8.20.0` | JSON Schema 运行时校验候选的固定实现 |
+| `@sinclair/typebox` | `0.34.52` | JSON Schema 兼容的类型构造器；不进入公开协议格式 |
+| ESLint | `9.39.5` | 静态规则与禁止导入；ESLint 10 超出当前 TypeScript/Vue lint 插件兼容范围，已在工具链验证中否决 |
+| Prettier | `3.9.6` | 格式检查 |
+| dependency-cruiser | `18.2.0` | 包依赖方向、环和跨边界导入检查 |
+| `@electron/packager` | `20.3.0` | Gate 1 目录产物 smoke test；发布安装包工具在对应 Gate 再固定 |
+| esbuild | `0.28.2` | 将 Main 与 preload 分别打包为 ESM/CJS；只负责产物组装，不替代业务包类型检查 |
+
+正式依赖全部使用精确版本，不使用 `^`、`~` 或 `latest`。自动更新只能提出变更，不能静默改写 Electron 主版本、Node 基线或 runner 标签。
+
+## Workspace 准入证据与 Gate 1 退出证据
+
+为避免暂缺 Windows/macOS 真机阻塞 Ubuntu 上的主体开发，本基线区分两类证据，但不降低三平台目标：
+
+### Workspace 准入（已满足）
+
+- 精确工具版本和 runner 标签已固定。
+- `pnpm install --frozen-lockfile`、类型检查、测试和构建门禁通过；`pnpm peers check` 在 pnpm `11.24.0` 对当前含空 importer 的 workspace 会触发自身的 `undefined.devDependencies` 异常，因此不作为 CI 门禁，不能把该命令异常解释为项目 peer 冲突。
+- TypeScript Main 构建和 Vite Renderer 生产构建通过。
+- Electron 44 开发实例及 Linux x64 目录产物均在 Ubuntu 26.04 GNOME 原生 Wayland 会话启动。
+- `contextIsolation=true`、`sandbox=true`、`webSecurity=true`、`nodeIntegration=false`；Renderer 运行时 `process` 与 `require` 均为 `undefined`。
+- Linux 上的 Windows x64 与 macOS arm64 目录产物解析成功，但仅作为资源/打包输入证据。
+- 正式 workspace 现在使用最小 staging 和固定 `@electron/packager 20.3.0` 生成平台原生目录产物；Linux x64 产物已在本机生成并直接启动，确认可信 Host ready、Renderer Node 隔离和有界错误诊断。CI 已配置在各目标 runner 执行同一构建与 smoke；失败时只上传不含原始输出、路径、命令行或环境的结构化摘要并保留 7 天。实际 Windows/macOS 结果仍属于 Gate 1 退出证据。
+
+### Gate 1 退出（尚未满足）
+
+- 正式 workspace 在 `ubuntu-26.04`、`windows-2025` 和 `macos-26` 执行类型、单元、契约、组件和构建矩阵。
+- Windows x64 与 macOS arm64 在目标 runner 启动正式应用并执行基础 Electron E2E。
+- Ubuntu 26.04 原生 Wayland 对正式应用执行窗口 smoke test，而不是复用临时原型结果。
+- GitHub 托管 Ubuntu runner 不冒充 GNOME Wayland 用户会话；可选 Wayland job 默认关闭，并只匹配同时具有 `self-hosted/linux/x64/ztools-ubuntu-26.04-wayland` 标签的隔离桌面 runner。配置或启用该外部 runner 仍需单独授权和真实环境证据。
+- 三个平台产物均由对应平台生成；Linux 交叉生成的 macOS 产物缺少 codesign 后的 asar integrity 恢复，不能作为 macOS 发布或安全证据。
+- Electron 44 的精确 Wayland/Vulkan 兼容警告在正式 smoke 中转为有单元测试覆盖的 `expected-warning` 结构化诊断；参数矩阵证明只有 `--disable-gpu` 能消除该初始化输出，因此保留 Wayland 硬件加速，不退回 X11，也不为消除无故障警告永久关闭全部 GPU。Smoke 对其他 Electron `ERROR`、重复已知警告和超过 64 KiB 的 stderr 默认失败，并为每次运行创建、清理唯一临时 `user-data-dir`，不读取开发者 profile。退出阶段外部 SSL 尝试已通过正式 Host 的 Chromium 后台联网禁用、启动前主机解析拒绝、Session 远程请求默认拒绝、权限请求默认拒绝、CSP、自动测试和隔离原生 Wayland smoke 复测关闭；未来网络能力不得静默移除此策略，必须先完成网络 ADR 与受控 Port。
+
+缺少 Gate 1 退出证据时可以继续实现平台无关核心和 Ubuntu 主路径，但不能关闭 Gate 1、把对应平台标为 `implemented`，或宣传正式平台支持。
 
 ## 初始架构范围
 
@@ -34,7 +89,7 @@ CI 通过只能证明对应 runner 范围；托管 runner 不能替代真实 Win
 - Windows ARM64、Ubuntu ARM64：当前不在 Gate 1 矩阵，不能从源码可编译推断支持。
 - macOS Intel：是否构建、测试或标记 Community 必须在选定 Electron 与 CI 资源后由维护者决定。
 
-这些是工程范围候选，不是最终最低系统版本承诺。
+这些是 Gate 1 工程范围，不是最终最低系统版本承诺。
 
 ## 从候选到正式基线
 
@@ -45,7 +100,7 @@ CI 通过只能证明对应 runner 范围；托管 runner 不能替代真实 Win
 3. 开发 agent 记录一次范围固定的可丢弃验证原型；执行涉及依赖下载、云 CI 或远程设备时，按维护者沟通规则取得对应外部操作权限。
 4. 在隔离环境安装候选依赖，执行三平台最小构建、Ubuntu Wayland 启动和必要打包 smoke test。
 5. 保存版本、命令、平台、结果和失败限制等证据；验证代码与生成物不直接合入正式 workspace。
-6. 根据证据调整候选；通过后由维护者把本文件转为 `accepted`。
+6. 根据证据调整候选；通过后由有权决定的技术负责人把本文件转为 `accepted`。若改变产品方向、费用、外部服务、权限或产生不可逆影响，另行取得维护者决定。
 7. 只有此后才能在 `vnext` 创建正式 workspace、提交正式锁文件并安装正式产品依赖。
 
 ### 可丢弃验证原型规则
@@ -80,7 +135,7 @@ CI 通过只能证明对应 runner 范围；托管 runner 不能替代真实 Win
 - Electron 主版本升级若改变 Renderer 隔离、Wayland 行为、进程模型或公开插件环境，按 Level 2 评审。
 - 使用维护中的 Electron 版本；版本进入停止安全维护窗口前必须升级或停止发布。
 
-具体版本只能在执行时根据官方维护状态和依赖兼容性选择，本候选文档不虚构未来版本号。
+后续版本只能在升级时根据官方维护状态和依赖兼容性选择，本基线不虚构未来版本号。
 
 ## 工程基线接受条件
 
@@ -88,7 +143,7 @@ CI 通过只能证明对应 runner 范围；托管 runner 不能替代真实 Win
 - 精确版本候选、支持周期、CPU/OS 矩阵和验证范围已经过技术审阅。
 - 可丢弃验证原型已获维护者明确授权，且原型位置与清理规则有记录。
 - CI 提供商与当前可用固定 runner 标签已核验并记录。
-- Node/pnpm/Electron/TypeScript 精确版本已通过最小三平台构建原型。
+- Node/pnpm/Electron/TypeScript 精确版本已通过 Ubuntu 本机构建与启动原型；Windows/macOS 目录产物已解析，目标平台构建和启动明确保留为 Gate 1 退出证据。
 - Ubuntu 26.04 GNOME Wayland 本机启动证据已保存。
 - Windows 与 macOS 缺少真实设备的范围已明确标记为托管 CI/VM 证据，不宣传正式支持。
 - 验证原型没有作为正式产品 scaffold 合入 `vnext`，临时资源已清理或明确保留期限。

@@ -1,10 +1,10 @@
 # ADR-0012：副作用结果确定性模型
 
-- Status: proposed
+- Status: accepted
 - Proposed: 2026-08-21
-- Accepted: pending
-- Deciders: zhangchonghao
-- Approval record: [Further review follow-up](../reviews/BASELINE-0.1.md); pending maintainer decision
+- Accepted: 2026-08-26
+- Deciders: development agent under delegated technical authority
+- Approval record: [Baseline 0.1 review](../reviews/BASELINE-0.1.md), technical decision recorded under delegated authority
 - Reviewers: independent Agent review incorporated
 - Verification owner: zhangchonghao
 - Review by: before Gate 1 Contract Gateway implementation
@@ -42,9 +42,9 @@
 
 局部灵活，但会产生协议碎片，不同 Contract 可能对相同情况使用不同语义。
 
-## 提案
+## 决策
 
-建议选择方案 B。每个结果信封包含：
+选择方案 B。每个结果信封包含：
 
 ```text
 effectOutcome:
@@ -85,7 +85,7 @@ effectOutcome:
 
 Gateway 对不合法组合按内部协议错误处理，不把矛盾结果发送给调用方。
 
-## 后果（若接受）
+## 后果
 
 ### 正面
 
@@ -111,7 +111,7 @@ Gateway 对不合法组合按内部协议错误处理，不把矛盾结果发送
 
 ## 迁移与回滚
 
-当前没有实现。若接受，本 ADR 取代 `ERROR_MODEL.md` 中把 `outcome-unknown` 仅作为细分码的设计，并同步更新 ADR-0010、错误信封和 Contract 测试。若原型证明字段不足，应新建 ADR，不回退到每方法隐式解释。
+本 ADR 取代 `ERROR_MODEL.md` 中把 `outcome-unknown` 仅作为细分码的设计，并已同步到结果信封、Contract Kernel 与当前 Host Gateway。若后续实现证明字段不足，应新建 ADR，不回退到每方法隐式解释。
 
 ## 验证方式
 
@@ -122,4 +122,6 @@ Gateway 对不合法组合按内部协议错误处理，不把矛盾结果发送
 
 ## 实施记录
 
-尚未接受，尚未实施。现行规范仍是 `ERROR_MODEL.md` 中的 `outcome-unknown` 细分码。
+核心结果确定性规则已在 Contract Kernel 实施：测试独立定义接受矩阵，并穷举 `3 effect × 8 category × 5 effectOutcome × 5 retryability = 600` 个组合，固定只读、幂等写和非幂等写的正反例。Bootstrap、Search 与 Action/Window Visibility Gateway 的结果构造均调用统一校验；分派前写请求拒绝现在返回 `not-started`，Adapter 已执行后抛错、输出 Schema 无效或 committed/observed 不一致返回 `unknown + query-status-first`，非幂等写不能使用 `safe-with-backoff`。
+
+当前 Host Slice 的唯一非幂等动作和窗口显隐写契约已有自动化验证，但尚未出现需要持久幂等键、执行 ID 和独立状态查询方法的持久写用例。因此本 ADR 保持 `accepted`，相关通用恢复/持久化验证随首个此类写契约完成，不把当前局部实施扩大解释为所有未来写方法均已实现。

@@ -5,7 +5,7 @@
 - Last updated: 2026-08-21
 - Security review owner: zhangchonghao
 
-本文件把 [SECURITY.md](SECURITY.md) 中的安全目标与不变量扩展为可维护的跨 Gate 威胁模型骨架，不声称已经覆盖尚未设计的插件分发、网络代理和更新协议。Gate 1 的 Host Renderer 与 Contract Gateway 范围由 [专用威胁模型切片](threat-model/GATE1_HOST_GATEWAY.md) 负责；对应功能进入实现前，相关切片必须补齐并接受。
+本文件把 [SECURITY.md](SECURITY.md) 中的安全目标与不变量扩展为可维护的跨 Gate 威胁模型骨架，不声称已经覆盖尚未设计的插件分发、网络代理和更新协议。Gate 1 的 Host Renderer 与 Contract Gateway 范围由 [Gate 1 切片](threat-model/GATE1_HOST_GATEWAY.md) 负责；Gate 2 的 Host Search、宿主动作与窗口/焦点范围由 [Gate 2 切片](threat-model/GATE2_HOST_SEARCH.md) 负责。对应功能进入实现前，相关切片必须补齐并接受。
 
 ## 范围与假设
 
@@ -59,7 +59,7 @@ Platform Helper / GNOME Extension ◄──────────────�
 | ID | 威胁/攻击路径 | 主要控制 | 当前证据 | 最迟完成 |
 | --- | --- | --- | --- | --- |
 | TM-01 | 调用方伪造身份、Caller Role 或权限字段 | 连接绑定身份、默认拒绝、ADR-0010 | 已接受设计；Gate 1 Host 身份验证证据待专用切片 | Gate 1 Gateway；插件身份扩展留 Gate 3 |
-| TM-02 | 畸形/超大消息、原型污染或 Schema 绕过 | 严格 Schema、大小/深度限制、未知字段拒绝 | ADR-0010 已接受；消息上限与负向验证待 Gate 1 切片 | Gate 1 Gateway |
+| TM-02 | 畸形/超大消息、原型污染或 Schema 绕过 | 严格 Schema、大小/深度限制、未知字段拒绝 | Gate 1 已验证 64 KiB 传输、8 层深度、100 项数组、8 KiB 字符串、危险键拒绝和无原型重建；跨平台证据仍待完成 | Gate 1 Gateway |
 | TM-03 | Plugin UI 取得 Node/Electron/裸 IPC | sandbox、context isolation、最小 Bridge、恶意夹具 | ADR-0003 | Gate 3 |
 | TM-04 | 插件跨命名空间读取数据或密钥 | 身份绑定 Storage Port、系统密钥库、越权测试 | ADR-0008 | Gate 3 |
 | TM-05 | 安装包在校验后被替换、降级或回滚 | 原子安装、内容寻址、签名/来源/版本策略 | 未设计 | 分发实现前 |

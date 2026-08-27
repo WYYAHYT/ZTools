@@ -1,0 +1,7 @@
+{
+  "uuid": "ztools-previous-focus@ztools",
+  "name": "ZTools Previous Focus",
+  "description": "Restores the most recent eligible application before ZTools was focused.",
+  "version": 1,
+  "shell-version": ["50"]
+}

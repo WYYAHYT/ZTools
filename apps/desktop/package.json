@@ -1,0 +1,38 @@
+{
+  "name": "@ztools/desktop",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "main": "dist/main/main.js",
+  "scripts": {
+    "build": "corepack pnpm@11.24.0 run build:main && corepack pnpm@11.24.0 run build:renderer",
+    "build:main": "tsc --noEmit -p tsconfig.main.json && node scripts/build-main.mjs",
+    "build:renderer": "vite build",
+    "package:directory": "corepack pnpm@11.24.0 run build && node scripts/package-directory.mjs",
+    "smoke:directory": "node scripts/smoke-directory-package.mjs",
+    "verify:ci-platform": "node scripts/verify-ci-platform.mjs",
+    "dev": "corepack pnpm@11.24.0 run build && electron --ozone-platform=wayland --disable-vulkan .",
+    "start:wayland": "corepack pnpm@11.24.0 run build && electron --ozone-platform=wayland --disable-vulkan .",
+    "smoke:wayland": "corepack pnpm@11.24.0 run build && node smoke-test.mjs",
+    "typecheck": "tsc --noEmit -p tsconfig.main.json && vue-tsc --noEmit -p tsconfig.renderer.json"
+  },
+  "dependencies": {
+    "@vitejs/plugin-vue": "6.0.8",
+    "@ztools/bootstrap-application": "workspace:*",
+    "@ztools/contract-kernel": "workspace:*",
+    "@ztools/host-contracts": "workspace:*",
+    "@ztools/host-gateway": "workspace:*",
+    "@ztools/platform-capabilities": "workspace:*",
+    "@ztools/search-application": "workspace:*",
+    "@ztools/search-domain": "workspace:*",
+    "vue": "3.5.41"
+  },
+  "devDependencies": {
+    "@electron/packager": "20.3.0",
+    "@types/node": "24.10.1",
+    "electron": "44.0.0",
+    "typescript": "5.9.3",
+    "vite": "8.2.2",
+    "vue-tsc": "3.3.11"
+  }
+}

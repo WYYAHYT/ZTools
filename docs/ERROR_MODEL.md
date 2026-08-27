@@ -62,9 +62,9 @@
 - 超时、断线或进程崩溃后如何查询最终状态。
 - 重复请求返回原结果、冲突还是拒绝。
 
-如果调用方无法确定写操作是否提交，结果必须表达为 `outcome-unknown` 细分码，并将 `retryability` 设为 `query-status-first`；禁止把它映射为普通失败后直接重试。
+如果调用方无法确定写操作是否提交，结果必须将 `effectOutcome` 表达为 `unknown`，并将 `retryability` 设为 `query-status-first`；禁止把它映射为普通失败后直接重试。`category` 继续表达调用为什么没有得到正常结果，不能代替副作用确定性。
 
-进一步评审提出 [ADR-0012](adr/0012-effect-outcome-certainty.md)，建议把副作用确定性改为与 `category` 正交的 `effectOutcome` 字段。ADR-0012 当前为 `proposed`，因此本段细分码模型仍是现行已接受规范；在 ADR-0012 被接受前，不得把候选字段固化为正式 Contract。
+根据已接受的 [ADR-0012](adr/0012-effect-outcome-certainty.md)，副作用确定性是与 `category` 正交的 `effectOutcome` 字段。所有有副作用的方法必须声明 `effect`、commit point、结果查询或恢复方式、幂等键语义和合法的 `category`/`effectOutcome`/`retryability` 组合。正式 Contract 不得继续新增仅靠错误细分码表达副作用确定性的方案。
 
 ## 错误所有权
 
@@ -81,18 +81,19 @@
 - 重复协议攻击、超限消息和身份伪造可以触发连接终止与速率限制。
 - 用户取消、权限拒绝和系统授权拒绝不得误报为宿主崩溃。
 
-## 待 Gate 1 原型验证
+## 当前实施状态
 
-- TypeScript 中结果类型和异常边界的具体表达。
-- 取消信号跨 Electron IPC/MessagePort 的可靠传播方式。
-- deadline 的时钟来源和跨进程换算。
-- 幂等记录最小持久化方案。
-- 稳定错误码命名规则与本地化目录所有权。
+- TypeScript 结果信封、`effectOutcome` 和 `retryability` 已在 Contract Kernel 表达，600 个可能组合由独立测试矩阵穷举验证。
+- Bootstrap、Search、Action 与 Window Visibility Gateway 已统一执行结果组合校验；矛盾组合不能跨边界返回。
+- 取消、deadline、连接撤销、reload、窗口隐藏与 Renderer 崩溃的传播和资源清理已有本地自动化证据。
+- Host Slice 的窗口显隐和非幂等隐藏动作已覆盖 `committed`、`not-started`、`not-committed`、`unknown + query-status-first` 及 Adapter 输出无效路径。
+- 当前尚无需要持久幂等记录、执行 ID 和独立状态查询方法的持久写契约；该范围随首个此类方法实施，不能用当前内存窗口动作替代。
+- 稳定错误码和当前中文 `messageKey` 所有权已在各 Contract/Gateway 固定；完整本地化目录随多语言产品范围进入后续 Gate。
 
 ## 实施前验证条件
 
 - ADR-0010 与本模型使用一致术语。
-- ADR-0012 已决定，并按决定更新本模型与结果信封。
+- ADR-0012 已接受，并按决定更新本模型与结果信封。
 - 至少用一个只读方法、一个幂等写方法和一个结果可能未知的方法完成纸面例证。
 - 测试计划覆盖取消竞态、deadline、迟到结果、断线、重复请求和脱敏。
-- 实现证据完成后才可把本文状态改为 `implemented`。
+- 通用持久写恢复证据完成后才可把本文状态改为 `implemented`；当前核心结果矩阵与 Host Slice 写方法只构成部分实施证据。
