@@ -177,6 +177,25 @@ function getSpawnedElectronArguments(): string[] {
 }
 
 /**
+ * Describes the expected previous-application focus state for the runner.
+ *
+ * @returns The capability summary exposed by the current platform runtime.
+ */
+function getExpectedFocusCapabilitySummary(): string {
+  const isGnomeWayland =
+    process.platform === "linux" &&
+    process.env["XDG_SESSION_TYPE"]?.toLowerCase() === "wayland" &&
+    (process.env["XDG_CURRENT_DESKTOP"]
+      ?.toLowerCase()
+      .split(":")
+      .includes("gnome") ??
+      false);
+  return isGnomeWayland
+    ? "supported · missing · not-required · unavailable · not-applicable"
+    : "unsupported · not-required · not-required · unavailable · not-applicable";
+}
+
+/**
  * Waits until the real Renderer has completed its bootstrap Contract call.
  *
  * @param page The Electron Host Renderer page.
@@ -427,7 +446,7 @@ test("loads the isolated Host UI and rotates its connection on reload", async ()
       "supported · not-required · not-required · ready · not-applicable",
     );
     await expect(page.getByText(/焦点恢复：/)).toContainText(
-      "supported · missing · not-required · unavailable · not-applicable",
+      getExpectedFocusCapabilitySummary(),
     );
 
     const recallSamples = await page.evaluate(async () => {
