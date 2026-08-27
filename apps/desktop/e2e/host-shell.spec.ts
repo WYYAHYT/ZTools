@@ -167,6 +167,16 @@ async function waitForSecondInstanceExit(
 }
 
 /**
+ * Adds the Linux-only Chromium flag required by independently spawned E2E
+ * processes on hosted runners.
+ *
+ * @returns Additional arguments for the manually spawned Electron process.
+ */
+function getSpawnedElectronArguments(): string[] {
+  return process.platform === "linux" ? ["--no-sandbox"] : [];
+}
+
+/**
  * Waits until the real Renderer has completed its bootstrap Contract call.
  *
  * @param page The Electron Host Renderer page.
@@ -224,7 +234,7 @@ test("loads the isolated Host UI and rotates its connection on reload", async ()
 
     const searchInput = page.getByLabel("搜索命令");
     await searchInput.fill("不存在的查询");
-    await expect(page.getByText("没有匹配的宿主命令")).toBeVisible();
+    await expect(page.locator(".empty")).toHaveText("没有匹配的宿主命令");
     await expect(page.locator("#search-feedback")).toHaveText(
       "没有匹配的宿主命令",
     );
@@ -376,7 +386,12 @@ test("loads the isolated Host UI and rotates its connection on reload", async ()
       });
     const secondInstance = spawn(
       electronExecutable,
-      [...platformArguments, `--user-data-dir=${isolatedUserData}`, "."],
+      [
+        ...platformArguments,
+        ...getSpawnedElectronArguments(),
+        `--user-data-dir=${isolatedUserData}`,
+        ".",
+      ],
       {
         cwd: desktopDirectory,
         env: { ...process.env, ZTOOLS_GATE1_E2E: "1" },
@@ -484,7 +499,12 @@ test("recovers the trusted Host UI within a bounded Renderer crash budget", asyn
         : [];
     applicationProcess = spawn(
       electronExecutable,
-      [...platformArguments, `--user-data-dir=${isolatedUserData}`, "."],
+      [
+        ...platformArguments,
+        ...getSpawnedElectronArguments(),
+        `--user-data-dir=${isolatedUserData}`,
+        ".",
+      ],
       {
         cwd: desktopDirectory,
         env: {
