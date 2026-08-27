@@ -24,9 +24,9 @@ ADR-0013 已按维护者委托的技术权限接受，规定使用连接绑定�
 
 ## Gate 状态与并行范围
 
-Gate 1 仍为 `in-progress`。Windows x64、macOS arm64 的目标平台证据以及三平台 CI 实际运行结果仍缺失；Ubuntu Electron Wayland 的固定 Vulkan 兼容输出已转为有测试覆盖的显式诊断，其他 Electron `ERROR` 默认阻断。因此本记录允许并行准备和验证平台无关的 Search Domain/Application、Contract 和 Fake Adapter；不把当前工作宣称为 Gate 1 已关闭，也不宣称完整进入 Gate 2 或已提供三平台支持。
+Gate 1 已于 2026-08-27 根据 [Gate 1 关闭评审](GATE1-CLOSURE.md) 关闭。提交 `70ce0293d74d4cd32956aeec320126c9511c3722` 的 GitHub Actions 运行 [33033812484](https://github.com/WYYAHYT/ZTools/actions/runs/33033812484) 已通过 Ubuntu、Windows、macOS 三平台自动化矩阵；该证据不等同于真实交互式设备或公开平台支持。因此本记录允许继续进行 Gate 2 的真实平台验证，不把 Gate 2 宣称为已完成。
 
-在 Gate 1 跨平台证据完成、且本切片的自动化和目标平台证据满足验收规格前，不得把 Gate 2 标记为完成或发布平台支持承诺。
+在本切片的自动化和目标平台证据满足验收规格前，不得把 Gate 2 标记为完成或发布平台支持承诺。Gate 1 的工程自动化前置条件已经完成，但真实平台交互证据仍属于 Gate 2 自身的退出条件。
 
 ## 评审结论
 

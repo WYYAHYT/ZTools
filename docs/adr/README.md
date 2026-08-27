@@ -34,7 +34,7 @@ ADR 记录一项重要决策当时的背景、选择、替代方案和后果。�
 | [0006](0006-legacy-plugin-compatibility.md) | 首阶段旧插件兼容策略 | accepted |
 | [0007](0007-gnome-wayland-integration.md) | GNOME Wayland 完整能力集成策略 | accepted |
 | [0008](0008-storage-strategy.md) | 本地持久化与密钥存储策略 | accepted |
-| [0009](0009-engineering-technology-stack.md) | 工程技术栈 | accepted |
+| [0009](0009-engineering-technology-stack.md) | 工程技术栈 | implemented |
 | [0010](0010-contract-schema-identity-ownership.md) | Contract Schema、连接身份与协议所有权 | accepted |
 | [0011](0011-multidimensional-capability-state.md) | Capability 多维状态模型 | accepted |
 | [0012](0012-effect-outcome-certainty.md) | 副作用结果确定性模型 | accepted |

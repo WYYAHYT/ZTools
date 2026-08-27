@@ -124,7 +124,7 @@ Gate 1 Ubuntu smoke 不能代替 Gate 2 平台证据；Windows/macOS 结果仍�
 - 固定 2,000 条内存命令数据集、100 次查询的本地首批 p95 测量，1,000 次 session 替换资源压力测试，以及当前 Ubuntu/Electron 会话中 30 次隐藏后召回到下一渲染帧且搜索框可聚焦的 p95 ≤ 300ms 测量。
 - GNOME 50.1 隔离原生 Shell/Mutter/Wayland 链路的扩展加载、固定 D-Bus 方法、Main Transport、重放拒绝、disable/reenable，以及不同 PID 的 Shell 进程重启；跨重启持续存活的旧 Host client 检测 extension epoch 变化后自我撤销。真实窗口焦点恢复曾取得成功样本，但因 headless compositor 无法稳定控制前台归属，不计入稳定门禁，仍需正常 GNOME 会话证据。
 
-这些证据只代表当前 Ubuntu 开发环境、隔离 GNOME 会话和平台无关核心；自动可访问性语义、forced-colors 与缩放证据不替代 GNOME Orca、Windows Narrator、macOS VoiceOver 和真实系统高对比度的人工体验复查。它们也不替代 Windows/macOS 真实会话、三平台 CI、当前用户正常 GNOME 桌面的 Shell restart/多显示器/工作区证据，不关闭 Gate 1 或 Gate 2。
+这些证据只代表当前 Ubuntu 开发环境、隔离 GNOME 会话和平台无关核心；自动可访问性语义、forced-colors 与缩放证据不替代 GNOME Orca、Windows Narrator、macOS VoiceOver 和真实系统高对比度的人工体验复查。三平台 CI 已在提交 `70ce029` 通过并支持关闭 Gate 1，但它不替代 Windows/macOS 真实会话、当前用户正常 GNOME 桌面的 Shell restart/多显示器/工作区证据，也不关闭 Gate 2。
 
 ## 退出条件
 

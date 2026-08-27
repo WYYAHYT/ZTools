@@ -1,6 +1,6 @@
 # ADR-0009：工程技术栈
 
-- Status: accepted
+- Status: implemented
 - Proposed: 2026-08-21
 - Accepted: 2026-08-21
 - Deciders: zhangchonghao
@@ -110,4 +110,4 @@ ADR-0001 决定从零建设模块化单体，但其基线冻结前的早期候�
 
 ## 实施记录
 
-决策已接受，尚未实施。
+正式 Electron/Vue/TypeScript/pnpm workspace、精确版本、依赖边界和安全门禁已经落地。提交 `70ce029` 的三平台 CI 在 Ubuntu x64、Windows x64 和 macOS arm64 对正式应用完成构建、基础 Electron E2E 和对应平台原生目录产物 smoke；Ubuntu 正式应用另有原生 GNOME Wayland smoke。Gate 1 关闭证据见 [Gate 1 关闭评审](../reviews/GATE1-CLOSURE.md)。该实施状态不包含签名、安装包、真实设备交互或公开支持承诺。

@@ -4,7 +4,7 @@ ZTools vNext 是一个从零设计的跨平台效率工具与插件平台，目�
 
 ## 当前状态
 
-**Design Baseline 0.1 与 Gate 1 工程基线已接受，Gate 0 已关闭，Gate 1 正在实施。** 隔离原型已经验证精确 Node、pnpm、Electron、Vue、TypeScript 组合和 Ubuntu 26.04 原生 Wayland 安全窗口，允许创建正式 workspace、锁文件和工程骨架。Windows/macOS 目标平台启动、E2E 与三平台 CI 仍是 Gate 1 退出条件，不能由 Linux 交叉打包替代。文档中的 `accepted` 表示设计已经批准，不表示功能已经实现。
+**Design Baseline 0.1 已接受，Gate 0 与 Gate 1 已关闭，Gate 2 正在验证。** 正式 workspace、锁文件、架构与安全门禁、Contract Gateway，以及 Ubuntu、Windows、macOS 三平台 CI 的构建、基础 Electron E2E 和平台原生目录产物 smoke 已通过。当前 Host Search 纵向切片已经可运行，但真实 GNOME Wayland 焦点恢复、Windows/macOS 交互式桌面行为、多显示器和人工辅助技术仍属于 Gate 2 验证范围。文档中的 `accepted` 表示设计已经批准，不表示所有后续功能已经实现或平台已形成公开支持承诺。
 
 本项目不从旧 ZTools 继承架构。旧项目只作为行为、需求、失败经验、兼容数据和测试场景的只读资料来源。
 

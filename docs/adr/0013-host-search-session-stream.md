@@ -84,4 +84,4 @@ Gate 2 要求查询会话产生首批和后续增量结果，同时支持新查�
 
 ## 当前状态
 
-本 ADR 已在既定产品边界内按委托技术权限接受。Host Search stream 已完成本地实现与自动化验证：除连接撤销、reload 和 Renderer 卸载外，Electron 原生窗口 `hide` 事件会按事件发生时的可信连接撤销 Search Gateway；Renderer 在已提交隐藏后释放本地 Search Handle；独立 Renderer 崩溃 E2E 先保持一个未确认批次，再验证 `render-process-gone` 后连接清理和活动 session、未确认批次与容量等待者均归零。Windows/macOS 和完整真实桌面平台证据仍未完成，因此本 ADR 继续保持 `accepted`，Gate 2 也不据此标记完成。
+本 ADR 已在既定产品边界内按委托技术权限接受。Host Search stream 已完成本地实现与自动化验证：除连接撤销、reload 和 Renderer 卸载外，Electron 原生窗口 `hide` 事件会按事件发生时的可信连接撤销 Search Gateway；Renderer 在已提交隐藏后释放本地 Search Handle；独立 Renderer 崩溃 E2E 先保持一个未确认批次，再验证 `render-process-gone` 后连接清理和活动 session、未确认批次与容量等待者均归零。三平台 CI 自动化已经通过，但 Windows/macOS 与正常 GNOME Wayland 的完整真实桌面证据仍未完成，因此本 ADR 继续保持 `accepted`，Gate 2 也不据此标记完成。

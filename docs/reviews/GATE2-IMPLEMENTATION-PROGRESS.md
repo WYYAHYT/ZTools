@@ -31,13 +31,13 @@
 - GNOME 50.1 隔离 headless Shell 使用独立 HOME/XDG、Session Bus 和虚拟 Wayland monitor 完成稳定原生集成 smoke：官方扩展 enable/disable 成功，固定 `RestorePreviousFocus` 可 introspect，Main 的受控 GDBus Transport 实际连通，重放被拒绝，disable 后服务撤销，reenable 后 epoch 轮换；测试终止第一代 Shell 并启动不同 PID 的第二代 Shell，确认服务恢复，同一旧 Host client 返回 `focus.extensionEpochChanged` 后进入 `focus.sessionRevoked`。该稳定门禁已连续独立运行三次通过。候选窗口 `unmanaged`、候选替换和活动工作区变化会主动清理候选/过渡状态，disable 同步释放信号与状态机；这些清理语义由纯状态机测试和真实扩展加载/释放覆盖。
 - 当前不包含网络功能的 Host 切片已在 Chromium、Electron Session 和 Renderer CSP 三层默认拒绝远程网络与权限请求；原生 Wayland smoke 复测不再出现此前的外部 SSL 握手尝试。
 - Main/preload/Renderer 生产构建通过。
-- Linux x64 平台原生目录产物已经从最小运行时 staging 生成并直接启动，打包后的 Host ready 且 Renderer 继续无法访问 `process`/`require`；三平台 CI 已配置同一产物 smoke，但 Windows/macOS 尚未实际运行。
+- Linux x64 平台原生目录产物已经从最小运行时 staging 生成并直接启动，打包后的 Host ready 且 Renderer 继续无法访问 `process`/`require`；三平台 CI 已在对应 runner 实际执行同一产物 smoke，见提交 `70ce0293d74d4cd32956aeec320126c9511c3722` 的运行 [33033812484](https://github.com/WYYAHYT/ZTools/actions/runs/33033812484)。
 
 ## 未完成与不作虚假推断的证据
 
-- Gate 1 仍为 `in-progress`；没有把本地 Ubuntu 证据当作 Windows/macOS 或三平台 CI 证据。
+- Gate 1 已关闭；关闭评审只确认工程基线和自动化证据，不把本地 Ubuntu 证据当作真实 Windows/macOS 或正常 GNOME Wayland 用户会话证据。
 - 桌面入口重复启动召回已验证，但 Gate 2 入口明确排除的原生全局快捷键仍未实现；两者不互相替代。
-- Windows x64、macOS arm64 的真实启动/E2E 尚未验证；GitHub 云 CI 未触发。
+- Windows x64、macOS arm64 的真实交互式桌面启动/E2E 尚未验证；GitHub 云 CI 的自动化启动/E2E 已通过，但不能替代真实设备证据。
 - Ubuntu Electron Wayland 的 Electron 44 固定 Vulkan 兼容输出已通过参数矩阵解释并进入严格 smoke 分类：保留硬件加速，精确单行报告为 `expected-warning`，其他 Electron `ERROR`、重复警告和 stderr 超限均阻断。该处置关闭了“未解释警告”工程缺口，但不等于完成真实 GPU、多显示器或目标平台性能验证。
 - Previous App Focus 已有 GNOME 50.1 原生 headless Shell、虚拟 Wayland monitor、Shell PID 重启、旧 client 撤销和真实 D-Bus 证据；工作区与候选销毁清理语义已有自动测试。隔离 Shell 不提供可依赖、且不扩大产品权限的外部前台窗口控制接口，因此真实 GTK 候选恢复和候选退出两个脚本不再属于强制 headless 门禁：它们只在 GTK 自身明确报告窗口 active 后继续，不使用 Shell `Eval`、`FocusApp`、固定大等待或自动重试。历史成功样本保留，但不能替代当前用户正常桌面会话中的焦点恢复、Shell restart、多显示器/DPI、工作区或辅助技术发布级证据。当前用户目录未安装或启用扩展，产品在该会话仍保持明确降级，不伪造成功。
 - 当前 Ubuntu/Electron 召回 p95 门禁通过不等于三个目标平台或完整 GNOME 集成均达标；Windows、macOS 和 GNOME 平台 Adapter 仍需使用同一测量定义取得真实会话证据。
@@ -46,4 +46,4 @@
 
 ## 后续门禁
 
-继续完成 Windows/macOS CI/真实会话、Ubuntu Wayland Launcher Visibility/Previous App Focus 集成，以及三个平台的辅助技术与召回性能复查；完成后由独立评审记录决定是否转换 Gate 状态。
+继续完成 Windows/macOS 真实会话、Ubuntu Wayland Launcher Visibility/Previous App Focus 集成，以及三个平台的辅助技术与召回性能复查；三平台 CI 自动化已完成，不再作为 Gate 2 的未完成 CI 项。完成后由独立评审记录决定是否转换 Gate 状态。

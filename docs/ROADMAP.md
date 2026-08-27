@@ -40,6 +40,8 @@ Gate 0 已于 2026-08-21 经维护者评审关闭。基线提交及 Gate 1 授�
 
 退出条件：应用能显示可信空壳 UI；架构违规、安全配置回退和未知 RPC 会使 CI 失败。
 
+Gate 1 已于 2026-08-27 经技术关闭评审关闭。三平台 CI、基础 Electron E2E、平台原生目录产物 smoke、正式 Host Renderer/Contract Gateway 链路和 Ubuntu 原生 Wayland smoke 已取得证据；真实桌面交互、签名/发布安装包和公开平台支持仍由后续 Gate 负责。
+
 开始 Gate 1 实现前必须：
 
 - 接受工程技术栈 ADR-0009。
