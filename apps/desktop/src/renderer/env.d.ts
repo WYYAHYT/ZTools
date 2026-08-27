@@ -26,6 +26,9 @@ interface Window {
       visibility: "show" | "hide",
       reason: "user-action" | "escape" | "launcher-recall",
     ): Promise<HostVisibilityResponse>;
+    onWindowVisibilityChange(
+      onChange: (event: { readonly visibility: "visible" | "hidden" }) => void,
+    ): () => void;
   };
 }
 

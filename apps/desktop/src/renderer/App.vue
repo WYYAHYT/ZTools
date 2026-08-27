@@ -28,6 +28,7 @@ const inputElement = ref<HTMLInputElement>();
 const searchPending = ref(false);
 let searchGeneration = 0;
 let searchTimer: number | undefined;
+let removeVisibilityListener: (() => void) | undefined;
 
 const searchFeedback = computed((): string => {
   if (searchPending.value) {
@@ -247,6 +248,14 @@ watch(query, () => {
 
 onMounted(async () => {
   inputElement.value?.focus();
+  removeVisibilityListener = window.ztoolsHost.onWindowVisibilityChange(
+    ({ visibility }) => {
+      if (visibility === "visible") {
+        status.value = "窗口已显示";
+        inputElement.value?.focus();
+      }
+    },
+  );
   try {
     const result = await window.ztoolsHost.getBootstrap();
     if (result.ok && result.value !== undefined) {
@@ -265,6 +274,7 @@ onMounted(async () => {
 });
 
 onUnmounted(() => {
+  removeVisibilityListener?.();
   cancelActiveSearch();
   if (searchTimer !== undefined) {
     window.clearTimeout(searchTimer);
@@ -338,7 +348,10 @@ onUnmounted(() => {
           <span class="result-description">{{ result.description }}</span>
         </li>
       </ul>
-      <p v-if="query.length > 0 && !searchPending" class="empty">
+      <p
+        v-if="query.length > 0 && !searchPending && results.length === 0"
+        class="empty"
+      >
         没有匹配的宿主命令
       </p>
     </section>

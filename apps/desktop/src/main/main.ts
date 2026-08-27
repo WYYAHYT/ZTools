@@ -167,6 +167,12 @@ function logSearchResources(
  */
 async function recallFromSecondInstance(): Promise<void> {
   const result = await windowFocusAdapter.setVisibility("show");
+  if (result.effectOutcome === "committed" && result.visibility === "visible") {
+    windowInstance?.webContents.send(
+      "ztools.host.window.visibility.changed",
+      JSON.stringify({ visibility: "visible" }),
+    );
+  }
   console.log(
     createDiagnosticLine("ztools.launcher.second-instance", {
       effectOutcome: result.effectOutcome,
@@ -528,15 +534,30 @@ ipcMain.handle(
 
 ipcMain.handle(
   "ztools.host.window.visibility.set",
-  (event, encodedRequest: unknown) => {
+  async (event, encodedRequest: unknown) => {
     const decoded = decodeSearchRequest(
       event.sender,
       encodedRequest,
       "idempotent-write",
     );
-    return decoded.ok
-      ? actionGateway.setVisibility(decoded.context, decoded.payload)
-      : decoded.failure;
+    if (!decoded.ok) {
+      return decoded.failure;
+    }
+    const result = await actionGateway.setVisibility(
+      decoded.context,
+      decoded.payload,
+    );
+    if (
+      result.ok &&
+      result.effectOutcome === "committed" &&
+      result.value.visibility === "visible"
+    ) {
+      event.sender.send(
+        "ztools.host.window.visibility.changed",
+        JSON.stringify({ visibility: "visible" }),
+      );
+    }
+    return result;
   },
 );
 

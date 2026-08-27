@@ -104,6 +104,10 @@ interface VisibilityResponse {
   readonly messageKey?: string;
 }
 
+interface VisibilityChangedEvent {
+  readonly visibility: "visible" | "hidden";
+}
+
 export interface HostBridge {
   /**
    * Requests the immutable bootstrap snapshot through the named Host Contract method.
@@ -147,6 +151,16 @@ export interface HostBridge {
     visibility: "show" | "hide",
     reason: "user-action" | "escape" | "launcher-recall",
   ): Promise<VisibilityResponse>;
+
+  /**
+   * Subscribes to visibility changes committed by the Host Main process.
+   *
+   * @param onChange The callback receiving the validated visibility state.
+   * @returns An unsubscribe function that releases the fixed IPC listener.
+   */
+  onWindowVisibilityChange(
+    onChange: (event: VisibilityChangedEvent) => void,
+  ): () => void;
 }
 
 /**
@@ -244,6 +258,38 @@ export function createHostPreloadBridge(): HostBridge {
         "ztools.host.window.visibility.set",
         JSON.stringify({ visibility, reason }),
       ) as Promise<VisibilityResponse>;
+    },
+    onWindowVisibilityChange(
+      onChange: (event: VisibilityChangedEvent) => void,
+    ): () => void {
+      const listener = (
+        _event: Electron.IpcRendererEvent,
+        encoded: unknown,
+      ): void => {
+        if (typeof encoded !== "string") {
+          return;
+        }
+        try {
+          const parsed = JSON.parse(encoded) as Record<string, unknown>;
+          const visibility = parsed["visibility"];
+          if (
+            Object.keys(parsed).length !== 1 ||
+            (visibility !== "visible" && visibility !== "hidden")
+          ) {
+            return;
+          }
+          onChange({ visibility });
+        } catch {
+          // Malformed Main events are ignored and never forwarded across the Bridge.
+        }
+      };
+      ipcRenderer.on("ztools.host.window.visibility.changed", listener);
+      return (): void => {
+        ipcRenderer.removeListener(
+          "ztools.host.window.visibility.changed",
+          listener,
+        );
+      };
     },
   };
 }

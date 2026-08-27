@@ -244,6 +244,7 @@ test("loads the isolated Host UI and rotates its connection on reload", async ()
       bridgeKeys: [
         "executeAction",
         "getBootstrap",
+        "onWindowVisibilityChange",
         "setWindowVisibility",
         "startSearch",
       ],
@@ -264,6 +265,7 @@ test("loads the isolated Host UI and rotates its connection on reload", async ()
     await expect(
       page.getByRole("option", { name: /隐藏 ZTools/ }),
     ).toBeVisible();
+    await expect(page.locator(".empty")).toHaveCount(0);
     await expect(page.locator("#search-feedback")).toHaveText(
       "找到 1 个搜索结果",
     );
@@ -431,6 +433,7 @@ test("loads the isolated Host UI and rotates its connection on reload", async ()
         ),
       )
       .toBe(true);
+    await expect(page.getByText("窗口已显示")).toBeVisible();
     await expect
       .poll(() => parseSecondInstanceEvents(outputLines.join("")).at(-1))
       .toEqual({
