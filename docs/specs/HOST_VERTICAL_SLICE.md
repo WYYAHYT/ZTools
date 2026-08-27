@@ -2,6 +2,7 @@
 
 - Status: accepted
 - Progress: validation-pending
+- Implementation: implemented-for-current-slice
 - Required before: Gate 2 implementation
 - Product owner: zhangchonghao
 - Verification owner: zhangchonghao
@@ -24,9 +25,46 @@
 | P0 | 查询/输入上下文/空状态 | 连续按 Esc | 依次清查询、清输入上下文、隐藏窗口 | 隐藏失败必须显示，不假装成功 |
 | P1 | 搜索进行中 | 快速新查询或隐藏 | 旧结果不能覆盖新查询；资源可验证释放 | 迟到结果丢弃并只做脱敏诊断 |
 
-## 功能验收
+## 当前切片的功能验收
 
-进入完整 Gate 2 前按以下场景形成自动测试和平台证据：
+本文件把“已实现”和“已验证”分开记录，避免把计划功能、代码实现和真实环境证据混为一谈：
+
+- `implemented-and-verified`：代码已实现，并有自动化或已完成的手动证据。
+- `implemented-real-environment-pending`：代码路径已实现，但还需要在真实目标桌面、设备或辅助技术环境验证。
+- `not-implemented-in-this-slice`：当前切片明确不包含，不能作为当前功能进行手动验证。
+- `future-candidate`：后续阶段候选方向，尚未形成当前实现承诺。
+
+### 已实现并已验证
+
+- Host UI、固定内存宿主命令和本地增量搜索。
+- 查询替换、取消、迟到结果丢弃、稳定排序和结果选择。
+- 点击/Enter 执行“隐藏 ZTools”。
+- Escape 分步行为。
+- 窗口隐藏、单实例重复启动召回和召回后的输入框聚焦。
+- 有结果时不显示空状态、无结果时显示空状态。
+- Contract、资源清理、崩溃恢复和 Electron 安全默认值。
+
+### 已实现但真实环境证据待补
+
+- GNOME Shell 扩展安装/启用后的 Previous App Focus 真实恢复。
+- 正常 GNOME Wayland 用户会话中的 Shell restart、工作区和多显示器行为。
+- Windows/macOS 真实交互式桌面中的窗口召回、焦点和多显示器行为。
+- GNOME Orca、Windows Narrator、macOS VoiceOver 及真实系统高对比度的人工复查。
+
+这些项目是对现有代码路径的环境验证，不代表需要先开发新的搜索功能。
+
+### 当前切片未实现且明确排除
+
+- 原生全局快捷键。
+- 真实应用发现/启动。
+- 文件搜索、剪贴板输入和网络 Provider。
+- 第三方插件、市场、账号、持久化历史和 SQLite 数据存储。
+
+上述项目不能在当前 Host Search 窗口中进行“功能验证”；若要开发，必须另立功能切片并补充契约、权限、失败路径、测试和文档。
+
+## 环境验证清单
+
+对已实现功能，进入 Gate 2 完整退出评审前按以下场景形成自动测试和相应真实平台证据：
 
 - 主窗口首次召回、重复召回、隐藏和先前应用已退出。
 - 空查询、快速连续查询、查询取消和窗口隐藏时的未完成请求。
@@ -80,7 +118,7 @@ Launcher Visibility 和 Previous App Focus 是两个独立 Capability，分别�
 | Capability | ADR-0011 状态组合、show/hide、焦点成功/受限/失败、运行期撤销 |
 | Host UI | 空查询、快速输入、键盘循环、选择保持、Esc 分步、错误文案、ARIA live |
 | Electron E2E | reload/hide/render gone 清理与有界本地恢复、Bridge 白名单、无 Node/Electron、CSP/导航阻断 |
-| 平台 | 三平台召回、快捷键冲突、焦点结果、多显示器/缩放和明确降级 |
+| 平台 | 已实现的召回、焦点结果、多显示器/缩放和明确降级；全局快捷键不属于本切片 |
 
 ## 性能与资源目标
 
@@ -102,17 +140,17 @@ Launcher Visibility 和 Previous App Focus 是两个独立 Capability，分别�
 
 ## 平台证据
 
-| 平台 | 自动证据 | 真实会话证据 | 允许降级 |
+| 平台 | 当前已取得的自动证据 | 仍待取得的真实会话证据 | 允许降级 |
 | --- | --- | --- | --- |
-| Ubuntu GNOME Wayland | Contract/Application/Fake Adapter、Electron E2E | 召回、焦点、Portal | 能力缺失显示 unavailable，不绕过授权 |
-| Windows x64 | 三平台 CI、Electron E2E、Fake Adapter | 快捷键、焦点、多显示器 | 快捷键冲突返回 conflict，搜索仍可使用 |
-| macOS arm64 | 三平台 CI、Electron E2E、Fake Adapter | app hide/activate、权限、焦点 | 恢复受限时保留搜索，不强行激活其他应用 |
+| Ubuntu GNOME Wayland | Contract/Application/Fake Adapter、Electron E2E、正式应用本地 Wayland smoke、隔离 GNOME Shell 扩展链路 | 正常用户会话中的召回、焦点、Shell restart、工作区和多显示器 | 扩展或能力缺失显示 unavailable，不绕过授权 |
+| Windows x64 | 三平台 CI、Electron E2E、Windows 原生目录产物 smoke | 真实桌面中的召回、焦点和多显示器 | 当前切片不提供全局快捷键；搜索仍可使用 |
+| macOS arm64 | 三平台 CI、Electron E2E、macOS 原生目录产物 smoke | 真实桌面中的 app hide/activate、权限、焦点和多显示器 | 恢复受限时保留搜索，不强行激活其他应用 |
 
-Gate 1 Ubuntu smoke 不能代替 Gate 2 平台证据；Windows/macOS 结果仍是阻断项。
+Gate 1 的自动化证据不能代替 Gate 2 的真实平台证据；当前切片未实现的功能不属于本表的验证对象。
 
-## 当前实现证据
+## 当前实现与验证证据
 
-已完成并在 Ubuntu 开发环境验证的范围：
+以下是当前已实现范围及其证据层级：
 
 - Search Domain 的 Unicode NFC/大小写折叠、匹配等级、稳定全序、去重和 `resultId` 选择保持。
 - Search Application 的固定内存 Provider、查询替换取消、Provider 独立失败、迟到结果丢弃、连接取消和资源清理。
@@ -124,16 +162,18 @@ Gate 1 Ubuntu smoke 不能代替 Gate 2 平台证据；Windows/macOS 结果仍�
 - 固定 2,000 条内存命令数据集、100 次查询的本地首批 p95 测量，1,000 次 session 替换资源压力测试，以及当前 Ubuntu/Electron 会话中 30 次隐藏后召回到下一渲染帧且搜索框可聚焦的 p95 ≤ 300ms 测量。
 - GNOME 50.1 隔离原生 Shell/Mutter/Wayland 链路的扩展加载、固定 D-Bus 方法、Main Transport、重放拒绝、disable/reenable，以及不同 PID 的 Shell 进程重启；跨重启持续存活的旧 Host client 检测 extension epoch 变化后自我撤销。真实窗口焦点恢复曾取得成功样本，但因 headless compositor 无法稳定控制前台归属，不计入稳定门禁，仍需正常 GNOME 会话证据。
 
+- GNOME Shell 扩展链路属于“已实现并通过隔离环境自动验证”，不是“当前用户桌面已验证”。当前用户会话未安装或启用扩展时，产品按设计显示 `missing/unavailable`，搜索和隐藏功能仍可用。
+
 这些证据只代表当前 Ubuntu 开发环境、隔离 GNOME 会话和平台无关核心；自动可访问性语义、forced-colors 与缩放证据不替代 GNOME Orca、Windows Narrator、macOS VoiceOver 和真实系统高对比度的人工体验复查。三平台 CI 已在提交 `70ce029` 通过并支持关闭 Gate 1，但它不替代 Windows/macOS 真实会话、当前用户正常 GNOME 桌面的 Shell restart/多显示器/工作区证据，也不关闭 Gate 2。
 
-## 退出条件
+## 当前切片退出条件
 
 - 本文已转为 `accepted`，并在 `docs/reviews/` 留评审记录。
 - 旧行为审计完成首切片用户行为、失败案例和放弃项。
 - Search Session、Action、Launcher Visibility/Previous App Focus 契约所有权、Schema、权限、取消、超时、错误和审计语义明确。
-- P0 旅程通过 Fake Adapter 与对应平台证据；旧结果不覆盖新查询，隐藏和取消不泄漏资源。
+- P0 旅程通过 Fake Adapter 和自动化 Electron 证据；旧结果不覆盖新查询，隐藏和取消不泄漏资源。真实平台证据单独按平台表追踪。
 - 可访问性、性能测量方法、目标值和降级文案有复查证据。
 
 ## 接受范围与剩余门禁
 
-产品范围、语言、数据留存和候选性能目标已由 [Gate 2 入口评审](../reviews/GATE2-ENTRY.md) 接受，因此允许实现和验证本切片。`accepted` 不表示所有退出条件已经完成；当前 Host UI 语义与 Ubuntu/Electron 召回基线已有自动化证据，Windows/macOS、完整 GNOME 平台集成、人工辅助技术复查和 Gate 转换仍需单独完成。
+产品范围、语言、数据留存和候选性能目标已由 [Gate 2 入口评审](../reviews/GATE2-ENTRY.md) 接受，因此允许实现和验证本切片。`accepted` 只表示设计范围获准；`Implementation: implemented-for-current-slice` 表示当前切片代码已经完成；`Progress: validation-pending` 表示真实平台和人工体验证据仍未全部完成。原生全局快捷键、真实应用启动、文件/剪贴板搜索和第三方插件不属于当前切片，不能以“待验证”描述。

@@ -6,7 +6,7 @@
 - Decider: development agent under delegated technical authority
 - Approval record: [Gate 2 technical design review](../reviews/GATE2-TECHNICAL-DESIGN.md)
 - Verification owner: zhangchonghao
-- Review by: before Gate 2 Host Search implementation
+- Review by: after the first additional Host Search slice or protocol change
 - Supersedes: none
 - Superseded by: none
 - Related: [HOST_VERTICAL_SLICE](../specs/HOST_VERTICAL_SLICE.md), [ADR-0004](0004-typed-rpc-contracts.md), [ADR-0010](0010-contract-schema-identity-ownership.md), [ERROR_MODEL](../ERROR_MODEL.md)

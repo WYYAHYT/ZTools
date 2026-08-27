@@ -1,10 +1,20 @@
 # Gate 2 首个宿主搜索切片实施进度评审
 
 - Status: validation-pending
+- Implementation: implemented-for-current-slice
 - Recorded: 2026-08-26
 - Technical implementation owner: development agent under delegated technical authority
 - Verification owner: zhangchonghao
 - Product scope authority: zhangchonghao
+
+## 状态分类
+
+本记录将 Gate 2 内容分开记录：
+
+- `implemented-and-verified`：当前切片代码已实现，并有自动化或手动证据。
+- `implemented-real-environment-pending`：当前切片代码已实现，但真实桌面、设备或辅助技术证据尚未取得。
+- `not-implemented-in-this-slice`：当前切片明确排除，不能直接验证。
+- `future-candidate`：后续阶段候选，不是当前实现承诺。
 
 ## 已实现范围
 
@@ -15,6 +25,28 @@
 - Electron Main/preload/Host UI：命名 Bridge、搜索结果增量显示、旧查询替换、键盘导航、分步 Esc、唯一宿主隐藏动作和独立焦点恢复状态；Electron 原生 `hide` 事件会撤销事件发生时可信连接拥有的 Search Gateway 资源，Renderer 在已提交隐藏、新查询和卸载时同步释放本地 Search Handle。
 - Launcher Visibility / Previous App Focus Capability：两个独立 ID 和五维状态快照、平台无关 Port、Fake Adapter、独立 Electron Launcher Adapter、命名 `host.window.visibility.set` Contract，以及显示 `ready`、焦点恢复 `unavailable` 的独立降级表达。
 - 数据边界：搜索 query、result payload 和使用历史没有写入持久化存储；命令和 session 只存于当前进程。
+
+以上内容属于 `implemented-and-verified`。自动化证据以本记录的验证结果为准；基础用户可见行为已经在 Ubuntu GNOME Wayland 手动复测通过。
+
+## 已实现但真实环境证据待补
+
+以下不是缺少代码，而是尚未在目标真实环境中完成验证：
+
+- GNOME Shell 扩展安装/启用后的真实 Previous App Focus。
+- 正常 GNOME Wayland 用户会话中的 Shell restart、工作区和多显示器行为。
+- Windows/macOS 真实交互式桌面中的召回、焦点和多显示器行为。
+- Orca、Narrator、VoiceOver 和真实系统高对比度人工复查。
+
+隔离 GNOME Shell/Wayland smoke 和三平台 GitHub Actions 只能证明协议、自动化和构建/启动路径，不能升级为上述真实环境证据。
+
+## 当前切片未实现且明确排除
+
+以下项目不在当前 Host Search 切片中，当前没有可供手动验收的实现：
+
+- 原生全局快捷键。
+- 真实应用发现/启动。
+- 文件搜索、剪贴板输入、网络 Provider。
+- 第三方插件、市场、账号、持久化历史和 SQLite 数据存储。
 
 ## 验证结果
 
@@ -36,14 +68,14 @@
 ## 未完成与不作虚假推断的证据
 
 - Gate 1 已关闭；关闭评审只确认工程基线和自动化证据，不把本地 Ubuntu 证据当作真实 Windows/macOS 或正常 GNOME Wayland 用户会话证据。
-- 桌面入口重复启动召回已验证，但 Gate 2 入口明确排除的原生全局快捷键仍未实现；两者不互相替代。
+- 桌面入口重复启动召回已验证；Gate 2 入口明确排除的原生全局快捷键仍未实现，两者不互相替代。
 - Windows x64、macOS arm64 的真实交互式桌面启动/E2E 尚未验证；GitHub 云 CI 的自动化启动/E2E 已通过，但不能替代真实设备证据。
 - Ubuntu Electron Wayland 的 Electron 44 固定 Vulkan 兼容输出已通过参数矩阵解释并进入严格 smoke 分类：保留硬件加速，精确单行报告为 `expected-warning`，其他 Electron `ERROR`、重复警告和 stderr 超限均阻断。该处置关闭了“未解释警告”工程缺口，但不等于完成真实 GPU、多显示器或目标平台性能验证。
 - Previous App Focus 已有 GNOME 50.1 原生 headless Shell、虚拟 Wayland monitor、Shell PID 重启、旧 client 撤销和真实 D-Bus 证据；工作区与候选销毁清理语义已有自动测试。隔离 Shell 不提供可依赖、且不扩大产品权限的外部前台窗口控制接口，因此真实 GTK 候选恢复和候选退出两个脚本不再属于强制 headless 门禁：它们只在 GTK 自身明确报告窗口 active 后继续，不使用 Shell `Eval`、`FocusApp`、固定大等待或自动重试。历史成功样本保留，但不能替代当前用户正常桌面会话中的焦点恢复、Shell restart、多显示器/DPI、工作区或辅助技术发布级证据。当前用户目录未安装或启用扩展，产品在该会话仍保持明确降级，不伪造成功。
 - 当前 Ubuntu/Electron 召回 p95 门禁通过不等于三个目标平台或完整 GNOME 集成均达标；Windows、macOS 和 GNOME 平台 Adapter 仍需使用同一测量定义取得真实会话证据。
 - atomic live region、alert、组合框关系、forced-colors 和 200% 缩放已有自动化证据，但不能代替 Windows Narrator、macOS VoiceOver 与 GNOME Orca 的实际语音顺序、键盘浏览和真实系统高对比度人工复查。
-- Gate 2 不标记完成，平台支持不标记为正式 Supported。
+- Gate 2 不标记完成，平台支持不标记为正式 Supported；当前切片未实现的功能不纳入本轮验证。
 
 ## 后续门禁
 
-继续完成 Windows/macOS 真实会话、Ubuntu Wayland Launcher Visibility/Previous App Focus 集成，以及三个平台的辅助技术与召回性能复查；三平台 CI 自动化已完成，不再作为 Gate 2 的未完成 CI 项。完成后由独立评审记录决定是否转换 Gate 状态。
+继续完成已实现能力的 Windows/macOS 真实会话、Ubuntu Wayland Launcher Visibility/Previous App Focus 集成，以及三个平台的辅助技术与召回性能复查；三平台 CI 自动化已完成，不再作为 Gate 2 的未完成 CI 项。未实现的全局快捷键、应用启动和插件能力不纳入本轮验证，需在后续功能切片中另行设计和开发。完成后由独立评审记录决定是否转换 Gate 状态。

@@ -49,6 +49,6 @@ ADR-0009、ADR-0010 与 ADR-0011 源自独立评审指出的 Gate 1 缺口，已
 
 ADR-0012 源自进一步评审对 `outcome-unknown` 的语义澄清，已接受以正交 `effectOutcome` 表达副作用确定性；600 个组合的核心矩阵和当前 Host Gateway 已实施验证，持久幂等键、执行 ID 与独立状态查询随首个持久写契约完成。
 
-ADR-0013 已在既定产品边界内按委托技术权限接受，规定 Gate 2 Host Search 使用有界、连接绑定的事件流；Host Vertical Slice 规格和 Gate 2 威胁模型接受前仍不得实现。
+ADR-0013 已在既定产品边界内按委托技术权限接受，规定 Gate 2 Host Search 使用有界、连接绑定的事件流。对应 Host Vertical Slice 当前切片已完成本地实现与自动化验证；真实平台和人工体验证据仍按 Gate 2 退出门禁追踪。该 ADR 的 `accepted` 状态表示决策已获准实现，不表示整个 Gate 2 已完成。
 
 ADR-0014 已在 ADR-0007 接受的可选 GNOME Shell 扩展范围内按委托技术权限接受，规定扩展只维护并恢复 Shell 内部记录的前一窗口，不接受任意目标窗口或通用 Shell 操作；协议客户端、扩展、Main Transport 和 GNOME 50.1 隔离 Shell/Wayland 焦点纵向链路已实现并验证，当前用户正常桌面的安装、启用、多显示器与 Shell restart 证据仍未完成。

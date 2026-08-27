@@ -8,7 +8,7 @@
 - Verification owner: zhangchonghao
 - Last updated: 2026-08-26
 
-本威胁模型的产品范围由 [Gate 2 入口评审](../reviews/GATE2-ENTRY.md) 接受；接受本文件允许实现对应的首个 Host Slice，不代表 Gate 1 已关闭或三个目标平台能力已验证。
+本威胁模型的产品范围由 [Gate 2 入口评审](../reviews/GATE2-ENTRY.md) 接受；接受本文件允许实现对应的首个 Host Slice，不代表所有列出的真实平台证据已经取得。当前切片明确不覆盖全局快捷键、真实应用启动、文件/剪贴板输入或第三方插件。
 
 本切片覆盖可信 Host Renderer、Search Application、内存 Host Command Provider、宿主动作和 Launcher Visibility/Previous Focus Capability。它不覆盖第三方插件、应用发现、文件/剪贴板输入、网络 Provider、持久化历史或真实应用启动。
 
@@ -84,4 +84,4 @@ created -> starting -> active -> completing -> completed
 
 ## 当前验证证据
 
-已通过本地自动化验证：Contract/Gateway 的未知字段、跨连接 session/action token、ack 背压、连接撤销和资源清理；Search Application 的旧 session 迟到结果丢弃；Launcher Visibility 与 Previous App Focus 的独立 ID、五维快照、Fake Adapter 降级组合、双快照 Action 输出、独立 Electron Launcher Adapter 和命名 Visibility Contract；Electron E2E 的 Bridge、reload、搜索替换、Esc 隐藏、action 隐藏、两项能力的独立展示、组合框关系、独立 atomic live region、assertive alert、forced-colors 和 200% 缩放语义；Electron 原生 `hide` 事件撤销当时可信连接的 Search Gateway，Main 的无载荷 `ztools.search.hidden-cleanup` 诊断验证活动 session、未确认批次和容量等待者均归零；独立 Renderer 崩溃 E2E 在崩溃前保持一个未确认批次，并由 `render-process-gone` 清理连接后验证活动 session、未确认批次和容量等待者均归零；第二个真实 Electron 进程不消费或记录启动参数，取得单实例锁失败后正常退出，并由首实例经 Launcher Capability 召回唯一窗口；固定数据集的搜索性能、1,000 次替换压力，以及当前 Ubuntu/Electron 会话 30 次召回 p95 ≤ 300ms 门禁。GNOME 50.1 隔离原生 Shell/Mutter/Wayland 测试还验证了 Shell PID 重启后服务恢复、extension epoch 变化和旧 Host client 永久撤销。真实 Windows、macOS 和当前用户正常 GNOME Wayland 会话、人工辅助技术与平台性能证据仍待完成，因此本文件暂不标记为 `verified`。
+已通过本地自动化验证：Contract/Gateway 的未知字段、跨连接 session/action token、ack 背压、连接撤销和资源清理；Search Application 的旧 session 迟到结果丢弃；Launcher Visibility 与 Previous App Focus 的独立 ID、五维快照、Fake Adapter 降级组合、双快照 Action 输出、独立 Electron Launcher Adapter 和命名 Visibility Contract；Electron E2E 的 Bridge、reload、搜索替换、Esc 隐藏、action 隐藏、两项能力的独立展示、组合框关系、独立 atomic live region、assertive alert、forced-colors 和 200% 缩放语义；Electron 原生 `hide` 事件撤销当时可信连接的 Search Gateway，Main 的无载荷 `ztools.search.hidden-cleanup` 诊断验证活动 session、未确认批次和容量等待者均归零；独立 Renderer 崩溃 E2E 在崩溃前保持一个未确认批次，并由 `render-process-gone` 清理连接后验证活动 session、未确认批次和容量等待者均归零；第二个真实 Electron 进程不消费或记录启动参数，取得单实例锁失败后正常退出，并由首实例经 Launcher Capability 召回唯一窗口；固定数据集的搜索性能、1,000 次替换压力，以及当前 Ubuntu/Electron 会话 30 次召回 p95 ≤ 300ms 门禁。GNOME 50.1 隔离原生 Shell/Mutter/Wayland 测试还验证了 Shell PID 重启后服务恢复、extension epoch 变化和旧 Host client 永久撤销。上述证据属于自动化/隔离环境证据，基础用户可见行为另有 Ubuntu GNOME Wayland 手动复测；真实 Windows、macOS 和当前用户正常 GNOME Wayland 会话、人工辅助技术与平台性能证据仍待完成，因此本文件暂不标记为 `verified`。

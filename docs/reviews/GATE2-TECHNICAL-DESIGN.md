@@ -9,7 +9,7 @@
 
 ## 评审范围
 
-本评审只决定 Host Search 增量结果的技术传输形态，不批准 Gate 2 产品范围、不关闭 Gate 1、不触发外部服务，也不承诺 Windows/macOS 已验证。
+本评审只决定 Host Search 增量结果的技术传输形态，不批准 Gate 2 产品范围、不触发外部服务，也不承诺 Windows/macOS 已验证。Gate 1 已由独立关闭评审关闭；本记录不承担 Gate 1 状态。
 
 已评审：
 
@@ -29,7 +29,7 @@
 
 - `specs/HOST_VERTICAL_SLICE.md` 获得产品层接受。
 - `threat-model/GATE2_HOST_SEARCH.md` 在产品规格固定后完成一致性评审并接受。
-- Gate 1 的阶段转换按独立评审记录决定；本记录不能替代三平台证据。
+- Gate 1 已按独立评审记录关闭；本记录不能替代 Gate 2 的真实平台证据。
 - 实现必须先建立 Search Domain/Application、Provider Port 和 Contract Schema，不能直接在 Electron Main/Renderer 堆叠业务状态。
 
 ## 验证要求
