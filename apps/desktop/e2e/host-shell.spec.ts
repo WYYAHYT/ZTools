@@ -389,7 +389,13 @@ test("loads the isolated Host UI and rotates its connection on reload", async ()
       page.getByRole("option", { name: /隐藏 ZTools/ }),
     ).toBeVisible();
     await page.keyboard.press("Enter");
-    await expect(page.getByText("窗口已隐藏")).toBeVisible();
+    await expect
+      .poll(() =>
+        application?.evaluate(({ BrowserWindow }) =>
+          BrowserWindow.getAllWindows()[0]?.isVisible(),
+        ),
+      )
+      .toBe(false);
     await expect
       .poll(() =>
         parseSearchResourceEvents(outputLines.join(""))
@@ -438,7 +444,13 @@ test("loads the isolated Host UI and rotates its connection on reload", async ()
     await expect(searchInput).toBeFocused();
     await searchInput.fill("");
     await page.keyboard.press("Escape");
-    await expect(page.getByText("窗口已隐藏")).toBeVisible();
+    await expect
+      .poll(() =>
+        application?.evaluate(({ BrowserWindow }) =>
+          BrowserWindow.getAllWindows()[0]?.isVisible(),
+        ),
+      )
+      .toBe(false);
     await page.evaluate(() =>
       window.ztoolsHost.setWindowVisibility("show", "launcher-recall"),
     );

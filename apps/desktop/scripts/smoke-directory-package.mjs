@@ -104,6 +104,7 @@ const diagnostics = {
   rendererProcessIsolated: false,
   rendererRequireIsolated: false,
   knownVulkanWarningCount: 0,
+  knownHeadlessDbusErrorCount: 0,
   unexpectedErrorCount: 0,
 };
 
@@ -167,10 +168,15 @@ try {
   stage = "validate-diagnostics";
   const classifiedOutput = classifyWaylandSmokeDiagnostics(stderr);
   diagnostics.knownVulkanWarningCount = classifiedOutput.knownVulkanWarnings;
+  diagnostics.knownHeadlessDbusErrorCount =
+    classifiedOutput.knownHeadlessDbusErrors;
   diagnostics.unexpectedErrorCount = classifiedOutput.unexpectedErrors.length;
+  const maximumHeadlessDbusErrors =
+    process.env["ZTOOLS_XVFB_SMOKE"] === "1" ? 8 : 0;
   if (
     classifiedOutput.unexpectedErrors.length > 0 ||
-    classifiedOutput.knownVulkanWarnings > 1
+    classifiedOutput.knownVulkanWarnings > 1 ||
+    classifiedOutput.knownHeadlessDbusErrors > maximumHeadlessDbusErrors
   ) {
     throw new Error("Directory artifact emitted unsafe diagnostics");
   }

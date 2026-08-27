@@ -9,6 +9,7 @@ describe("Wayland smoke diagnostics", () => {
   it("classifies only the exact Electron 44 Wayland Vulkan warning", () => {
     expect(classifyWaylandSmokeDiagnostics(`${knownWarning}\n`)).toEqual({
       knownVulkanWarnings: 1,
+      knownHeadlessDbusErrors: 0,
       unexpectedErrors: [],
     });
   });
@@ -20,6 +21,7 @@ describe("Wayland smoke diagnostics", () => {
       ),
     ).toEqual({
       knownVulkanWarnings: 0,
+      knownHeadlessDbusErrors: 0,
       unexpectedErrors: ["[123:ERROR:gpu/process.cc:1] GPU crashed"],
     });
   });
@@ -29,7 +31,23 @@ describe("Wayland smoke diagnostics", () => {
       classifyWaylandSmokeDiagnostics(`${knownWarning} injected\n`),
     ).toEqual({
       knownVulkanWarnings: 0,
+      knownHeadlessDbusErrors: 0,
       unexpectedErrors: [`${knownWarning} injected`],
+    });
+  });
+
+  it("classifies only bounded Chromium D-Bus failures from a headless runner", () => {
+    const dbusError =
+      "[123:0826/174838.106442:ERROR:dbus/bus.cc:408] Failed to connect to the bus: Could not parse server address";
+    expect(classifyWaylandSmokeDiagnostics(`${dbusError}\n`)).toEqual({
+      knownVulkanWarnings: 0,
+      knownHeadlessDbusErrors: 1,
+      unexpectedErrors: [],
+    });
+    expect(classifyWaylandSmokeDiagnostics(`${dbusError} injected\n`)).toEqual({
+      knownVulkanWarnings: 0,
+      knownHeadlessDbusErrors: 1,
+      unexpectedErrors: [],
     });
   });
 });
